@@ -1,5 +1,7 @@
 import Category from "../models/categoryScheme.js";
 
+
+console.log("misc...")
 export async function initialize(req, res) {
   console.log("initialize...");
   let user, categories;

@@ -1,5 +1,6 @@
-import { initialize } from "../controllers/miscControllers.js";
 import express from "express";
+
+import { initialize } from "../controllers/miscControllers.js";
 
 const router = express.Router();
 

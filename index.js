@@ -1,8 +1,12 @@
-import express from "express";
-import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
+
+import express from "express";
+import mongoose from "mongoose";
+
 import dotenv from "dotenv";
+dotenv.config();
+
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import responseMiddleware from "./middlewares/responseMiddleWare.js";
@@ -11,7 +15,6 @@ import { checkToken } from "./middlewares/authMiddleWare.js";
 import miscRoutes from "./routes/miscRoutes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config();
 
 const app = express();
 app.use(express.json());
