@@ -4,4 +4,5 @@ export async function checkToken(req, res, next) {
     try {
     } catch (error) {}
   }
+  next();
 }
