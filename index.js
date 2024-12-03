@@ -13,6 +13,7 @@ import responseMiddleware from "./middlewares/responseMiddleWare.js";
 import { checkToken } from "./middlewares/authMiddleWare.js";
 
 import miscRoutes from "./routes/miscRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -29,6 +30,7 @@ app.use(responseMiddleware);
 app.use(checkToken);
 
 app.use("/misc", miscRoutes);
+app.use("/auth", authRoutes);
 
 try {
   await mongoose.connect(process.env.MONGO_URL);
