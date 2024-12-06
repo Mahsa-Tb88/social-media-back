@@ -1,7 +1,36 @@
+import jwt from "jsonwebtoken";
 import User from "../models/userSchema.js";
 import bcrypt from "bcrypt";
 
-export async function loginUser(req, res) {}
+export async function loginUser(req, res) {
+  const { username, password, remember } = req.body;
+  if (!username && !password) {
+    return res.fail("Please enter username and password!", 400);
+  }
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.fail("This username is not registerd!", 402);
+    }
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.fail("This Password is not valid!", 402);
+    }
+
+    const token = jwt.sign({ username }, process.env.SECRET_KEY, {
+      expiresIn: "7d",
+    });
+    const settings = { httpOnly: true, secure: true, sameSite: "Lax" };
+    if (remember) {
+      settings.maxAge = 7 * 86400 * 1000;
+    }
+    res.cookie("token", token, settings);
+    user.password = undefined;
+    res.success("Login Successfully", { user });
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
 
 export async function registerUser(req, res) {
   const { username, email, password } = req.body;
@@ -17,15 +46,16 @@ export async function registerUser(req, res) {
     if (findUsername || findEmail) {
       return res.fail("Username or Email is already exist!");
     }
-    const hashPassword = bcrypt.hash(password, 10);
+    const hashPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({
       username,
       email,
-      password,
+      password: hashPassword,
     });
     newUser.password = undefined;
     res.success("New User created successfully!", newUser);
   } catch (error) {
-    res.fail(e.message, 500);
+    console.log(error.message);
+    res.fail(error.message, 500);
   }
 }
