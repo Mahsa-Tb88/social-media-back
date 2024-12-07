@@ -59,3 +59,11 @@ export async function registerUser(req, res) {
     res.fail(error.message, 500);
   }
 }
+
+export function logoutUser(req, res) {
+  req.cookie.clear();
+  req.username = "";
+  req.role = "";
+  req.user._id = "";
+  res.success("logout was done Successully!");
+}

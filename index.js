@@ -3,11 +3,11 @@ import { fileURLToPath } from "url";
 
 import express from "express";
 import mongoose from "mongoose";
+import cors from "cors";
 
 import dotenv from "dotenv";
 dotenv.config();
 
-import cors from "cors";
 import cookieParser from "cookie-parser";
 import responseMiddleware from "./middlewares/responseMiddleWare.js";
 import { checkToken } from "./middlewares/authMiddleWare.js";

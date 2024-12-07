@@ -1,9 +1,7 @@
 import Category from "../models/categoryScheme.js";
+import User from "../models/userSchema.js";
 
-
-console.log("misc...")
 export async function initialize(req, res) {
-  console.log("initialize...");
   let user, categories;
   try {
     categories = await Category.find();
@@ -12,6 +10,8 @@ export async function initialize(req, res) {
   }
   try {
     if (req.username) {
+      const user = await User.findOne(req.username);
+      res.success("Initialized successfully!", { categories, user });
     } else {
       res.success("Initialized successfully!", { categories });
     }
