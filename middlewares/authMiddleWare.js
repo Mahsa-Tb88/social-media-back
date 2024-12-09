@@ -2,9 +2,8 @@ import jwt from "jsonwebtoken";
 import User from "../models/userSchema.js";
 
 export async function checkToken(req, res, next) {
-  console.log("req.cooke....", req.cookie);
   if (req.cookies?.token) {
-    const token = req.cookie.token;
+    const token = req.cookies.token;
     try {
       const decode = jwt.verify(token, process.env.SECRET_KEY);
       const user = await User.findOne({ username: decode.username });
