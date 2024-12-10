@@ -14,6 +14,7 @@ import { checkToken } from "./middlewares/authMiddleWare.js";
 
 import miscRoutes from "./routes/miscRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import profileRoutes from "./routes/profleRoutes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -28,9 +29,11 @@ app.use(
 );
 app.use(responseMiddleware);
 app.use(checkToken);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/misc", miscRoutes);
 app.use("/auth", authRoutes);
+app.use("/user", profileRoutes);
 
 try {
   await mongoose.connect(process.env.MONGO_URL);

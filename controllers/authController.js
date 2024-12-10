@@ -61,9 +61,6 @@ export async function registerUser(req, res) {
 }
 
 export function logoutUser(req, res) {
-  req.cookie.clear();
-  req.username = "";
-  req.role = "";
-  req.user._id = "";
+  res.clearCookie("token");
   res.success("logout was done Successully!");
 }
