@@ -6,7 +6,7 @@ export async function updateBackground(req, res) {
     res.fail("You are not authorized to change picture", 400);
   }
   try {
-    const user = await User.findByIdAndUpdate(id, { backImg: image });
+    const user = await User.findByIdAndUpdate(id, { backgroundImg: image });
     res.success("updated Image Successfully!", 200);
   } catch (error) {
     res.fail(error.message, 500);
