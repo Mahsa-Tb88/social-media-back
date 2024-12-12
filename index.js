@@ -8,24 +8,27 @@ import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 
-import cookieParser from "cookie-parser";
 import responseMiddleware from "./middlewares/responseMiddleWare.js";
 import { checkToken } from "./middlewares/authMiddleWare.js";
 
 import miscRoutes from "./routes/miscRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import profileRoutes from "./routes/profleRoutes.js";
+import cookieParser from "cookie-parser";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+
+
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(
-  cors({
-    origin: true,
-    credentials: true,
-  })
+    cors({
+        origin: true,
+        credentials: true,
+    })
 );
 app.use(responseMiddleware);
 app.use(checkToken);

@@ -8,18 +8,23 @@ export async function loginUser(req, res) {
     return res.fail("Please enter username and password!", 400);
   }
   try {
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ username: username.toLowerCase() });
     if (!user) {
-      return res.fail("This username is not registerd!", 402);
+      res.fail("This username is not registerd!", 402);
+      return;
     }
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res.fail("This Password is not valid!", 402);
     }
 
-    const token = jwt.sign({ username }, process.env.SECRET_KEY, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { username: username.toLowerCase() },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: "7d",
+      }
+    );
     const settings = { httpOnly: true, secure: true, sameSite: "Lax" };
     if (remember) {
       settings.maxAge = 7 * 86400 * 1000;
@@ -28,34 +33,37 @@ export async function loginUser(req, res) {
     user.password = undefined;
     res.success("Login Successfully", { user });
   } catch (error) {
-    res.fail(error.message);
+    console.log(error.message);
   }
 }
 
 export async function registerUser(req, res) {
-  const { username, email, password } = req.body;
+  const { username, email, password, work, livesIn } = req.body;
 
   if (!username || !email || !password) {
     return res.fail("Please Enter a value for all field!");
   }
 
   try {
-    const findUsername = await User.findOne({ username });
-    const findEmail = await User.findOne({ email });
+    const findUsername = await User.findOne({
+      username: username.toLowerCase(),
+    });
+    const findEmail = await User.findOne({ email: username.toLowerCase() });
 
     if (findUsername || findEmail) {
       return res.fail("Username or Email is already exist!");
     }
     const hashPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({
-      username,
-      email,
+      username: username.toLowerCase(),
+      email: username.toLowerCase(),
       password: hashPassword,
+      work,
+      livesIn,
     });
     newUser.password = undefined;
     res.success("New User created successfully!", newUser);
   } catch (error) {
-    console.log(error.message);
     res.fail(error.message, 500);
   }
 }
