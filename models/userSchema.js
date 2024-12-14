@@ -10,8 +10,7 @@ const userSchema = new mongoose.Schema(
     work: { type: String, default: "" },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    fallowers: { type: Array, default: [] },
-    fallowing: { type: Array, default: [] },
+    friends: { type: Array, default: [] },
   },
   { timestamps: true }
 );
