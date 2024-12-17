@@ -35,9 +35,32 @@ export async function getPostsUserById(req, res) {
     return;
   }
   try {
-    const posts = await Post.findById(req.params.id);
+    const posts = await Post.find({ userId: req.params.id });
+    console.log(",,,,", posts);
     res.success("found posts of user successfully!", posts);
   } catch (error) {
     res.fail(error.message, 500);
+  }
+}
+
+export async function createNewPost(req, res) {
+  const { title, desc, image, video, feeling, viewer, id } = req.body;
+  if (req.userId !== id) {
+    res.fail("You are not authorized to create this post");
+  }
+
+  try {
+    const newPost = await Post.create({
+      title,
+      desc,
+      userId: id,
+      image,
+      viewer,
+      feeling,
+      video,
+    });
+    res.success("New post created successfully!", newPost, 200);
+  } catch (error) {
+    res.fail(error.message);
   }
 }

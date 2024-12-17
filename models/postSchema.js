@@ -2,11 +2,13 @@ import mongoose, { Schema } from "mongoose";
 
 const postSchema = new mongoose.Schema(
   {
-    // userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    img: { type: String, default: "" },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    image: { type: String, default: "" },
+    video: { type: String, default: "" },
     title: { type: String, default: "" },
     desc: { type: String, default: "" },
-    isPublic: { type: Boolean, default: false },
+    feeling: { type: String, default: "" },
+    viewer: { type: String, default: "friends" },
   },
   { timestamps: true }
 );
