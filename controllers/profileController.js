@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Post from "../models/postSchema.js";
 import User from "../models/userSchema.js";
+import bcrypt from "bcrypt";
 
 export async function updateBackground(req, res) {
   const { image, id } = req.body;
@@ -36,7 +37,6 @@ export async function getPostsUserById(req, res) {
   }
   try {
     const posts = await Post.find({ userId: req.params.id });
-    console.log(",,,,", posts);
     res.success("found posts of user successfully!", posts);
   } catch (error) {
     res.fail(error.message, 500);
@@ -60,6 +60,38 @@ export async function createNewPost(req, res) {
       video,
     });
     res.success("New post created successfully!", newPost, 200);
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
+export async function editUserById(req, res) {
+  const { username, work, livesIn, password, email } = req.body;
+  const id = req.params.id;
+
+  const isValid = mongoose.isValidObjectId(req.params.id);
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  console.log(id, req.userId);
+  if (id != req.userId) {
+    res.fail("You are not athorize to edit");
+    return;
+  }
+
+  const hashPassword = await bcrypt.hash(password, 10);
+
+  try {
+    const user = await User.findByIdAndUpdate(id, {
+      username,
+      work,
+      livesIn,
+      password: hashPassword,
+      email,
+    });
+
+    res.success("user info updated Successfully!");
   } catch (error) {
     res.fail(error.message);
   }
