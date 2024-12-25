@@ -7,6 +7,7 @@ export async function loginUser(req, res) {
   if (!username && !password) {
     return res.fail("Please enter username and password!", 400);
   }
+
   try {
     const user = await User.findOne({ username: username.toLowerCase() });
     if (!user) {
@@ -33,7 +34,7 @@ export async function loginUser(req, res) {
     user.password = undefined;
     res.success("Login Successfully", { user });
   } catch (error) {
-    console.log(error.message);
+    res.fail(error.message);
   }
 }
 
@@ -48,7 +49,7 @@ export async function registerUser(req, res) {
     const findUsername = await User.findOne({
       username: username.toLowerCase(),
     });
-    const findEmail = await User.findOne({ email: username.toLowerCase() });
+    const findEmail = await User.findOne({ username: username.toLowerCase() });
 
     if (findUsername || findEmail) {
       return res.fail("Username or Email is already exist!");
@@ -56,7 +57,7 @@ export async function registerUser(req, res) {
     const hashPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({
       username: username.toLowerCase(),
-      email: username.toLowerCase(),
+      email: email.toLowerCase(),
       password: hashPassword,
       work,
       livesIn,
