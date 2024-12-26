@@ -4,7 +4,8 @@ import {
   updateProfileImg,
   getPostsUserById,
   createNewPost,
-  editUserById
+  editUserById,
+  getUserById
 } from "../controllers/profileController.js";
 
 const router = express.Router();
@@ -14,6 +15,7 @@ router.post("/profileImg", updateProfileImg);
 router.get("/posts/:id", getPostsUserById);
 router.post("/post", createNewPost);
 router.put("/edit/:id",editUserById)
+router.get("/:id",getUserById)
 
 
 export default router;
