@@ -5,7 +5,6 @@ import {
   getPostsUserById,
   createNewPost,
   editUserById,
-  getUserById
 } from "../controllers/profileController.js";
 
 const router = express.Router();
@@ -14,8 +13,6 @@ router.post("/background", updateBackground);
 router.post("/profileImg", updateProfileImg);
 router.get("/posts/:id", getPostsUserById);
 router.post("/post", createNewPost);
-router.put("/edit/:id",editUserById)
-router.get("/:id",getUserById)
-
+router.put("/edit/:id", editUserById);
 
 export default router;

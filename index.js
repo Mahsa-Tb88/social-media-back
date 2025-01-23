@@ -15,6 +15,7 @@ import miscRoutes from "./routes/miscRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import profileRoutes from "./routes/profleRoutes.js";
 import usersRoutes from "./routes/usersRoutes.js";
+import userRoute from "./routes/userRoute.js";
 import cookieParser from "cookie-parser";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -34,8 +35,9 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/misc", miscRoutes);
 app.use("/auth", authRoutes);
-app.use("/user", profileRoutes);
+app.use("/profile", profileRoutes);
 app.use("/users", usersRoutes);
+app.use("/user", userRoute);
 
 try {
   await mongoose.connect(process.env.MONGO_URL);
