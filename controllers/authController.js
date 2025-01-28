@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userSchema.js";
 import bcrypt from "bcrypt";
+import UserInfo from "../models/userInfoSchema.js";
 
 export async function loginUser(req, res) {
   const { username, password, remember } = req.body;
@@ -18,7 +19,6 @@ export async function loginUser(req, res) {
     if (!match) {
       return res.fail("This Password is not valid!", 402);
     }
-
     const token = jwt.sign(
       { username: username.toLowerCase() },
       process.env.SECRET_KEY,
@@ -26,12 +26,14 @@ export async function loginUser(req, res) {
         expiresIn: "7d",
       }
     );
+
     const settings = { httpOnly: true, secure: true, sameSite: "Lax" };
     if (remember) {
       settings.maxAge = 7 * 86400 * 1000;
     }
     res.cookie("token", token, settings);
     user.password = undefined;
+
     res.success("Login Successfully", { user });
   } catch (error) {
     res.fail(error.message);
@@ -60,6 +62,8 @@ export async function registerUser(req, res) {
       emailRegister: email.toLowerCase(),
       password: hashPassword,
     });
+    await UserInfo.create({ userId: newUser._id.toString() });
+
     newUser.password = undefined;
     res.success("New User created successfully!", newUser);
   } catch (error) {
