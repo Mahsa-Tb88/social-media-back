@@ -18,7 +18,6 @@ export async function getUserById(req, res) {
 }
 
 export async function getUserInfo(req, res) {
-  console.log("id", req.params.id);
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {
     res.fail("This User Id is not valid!");
@@ -52,32 +51,49 @@ export async function updateOverview(req, res) {
   try {
     const userInfo = await UserInfo.findOne({ userId: req.params.id });
     const findItem = userInfo.overview.find((item) => item.subject == subject);
-
+    let updatedOverview;
     if (findItem) {
-      const updatedOverview = userInfo.overview.map((i) => {
+      updatedOverview = userInfo.overview.map((i) => {
         if (i.subject == subject) {
           return { subject, value, viewer };
         } else {
           return i;
         }
       });
-      await UserInfo.findByIdAndUpdate(
-        { userId: req.params.id },
-        {
-          overview: updatedOverview,
-        }
-      );
     } else {
       const overview = userInfo.overview;
-      const updatedOverview = [...overview, { subject, value, viewer }];
-      await UserInfo.findOneAndUpdate(
-        { userId: req.params.id },
-        {
-          overview: updatedOverview,
-        }
-      );
+      updatedOverview = [...overview, { subject, value, viewer }];
     }
+
+    await UserInfo.findOneAndUpdate(
+      { userId: req.params.id },
+      {
+        overview: updatedOverview,
+      }
+    );
+    res.success(" was updated successfully");
   } catch (error) {
     console.log(error.message);
+  }
+}
+
+export async function deleteItemOverview(req, res) {
+  console.log("req.body", req.body);
+  console.log("id is", req.params.id);
+  const { subject } = req.body;
+
+  try {
+    const findUserInfo = await UserInfo.findOne({ userId: req.params.id });
+    const updatedOverview = findUserInfo.overview.filter(
+      (item) => item.subject != subject
+    );
+
+    await UserInfo.findOneAndUpdate(
+      { userId: req.params.id },
+      { overview: updatedOverview }
+    );
+    res.success("Overview was updated successfully");
+  } catch (error) {
+    res.fail(error.message, 500);
   }
 }
