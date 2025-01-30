@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userSchema.js";
 import bcrypt from "bcrypt";
-import UserInfo from "../models/userInfoSchema.js";
+import Overview from "../models/overviewSchema.js";
 
 export async function loginUser(req, res) {
   const { username, password, remember } = req.body;
@@ -62,7 +62,7 @@ export async function registerUser(req, res) {
       emailRegister: email.toLowerCase(),
       password: hashPassword,
     });
-    await UserInfo.create({ userId: newUser._id.toString() });
+    // await Overview.create({ userId: newUser._id.toString() });
 
     newUser.password = undefined;
     res.success("New User created successfully!", newUser);

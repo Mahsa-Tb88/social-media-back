@@ -2,15 +2,21 @@ import express from "express";
 import {
   getUserById,
   updateOverview,
-  getUserInfo,
+  getOverview,
   deleteItemOverview,
+  updateConatctUserInfo,
+  getContacUserInfo,
 } from "../controllers/userController.js";
 
 const router = express.Router();
 
 router.get("/:id", getUserById);
-router.get("/about/:id", getUserInfo);
+
+router.get("/overview/:id", getOverview);
 router.put("/editOverview/:id", updateOverview);
 router.put("/deleteOverview/:id", deleteItemOverview);
+
+router.get("/contactBaseInfo/:id", getContacUserInfo);
+router.put("/editContact/:id", updateConatctUserInfo);
 
 export default router;

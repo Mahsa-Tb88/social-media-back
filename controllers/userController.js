@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import User from "../models/userSchema.js";
-import UserInfo from "../models/userInfoSchema.js";
+import Overview from "../models/overviewSchema.js";
+import ContactBasicInfo from "../models/contactBaseInfoSchema.js";
 
 export async function getUserById(req, res) {
   const isValid = mongoose.isValidObjectId(req.params.id);
@@ -17,7 +18,8 @@ export async function getUserById(req, res) {
   }
 }
 
-export async function getUserInfo(req, res) {
+//overview
+export async function getOverview(req, res) {
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {
     res.fail("This User Id is not valid!");
@@ -29,13 +31,12 @@ export async function getUserInfo(req, res) {
   }
 
   try {
-    const userInfo = await UserInfo.findOne({ userId: req.params.id });
-    res.success("UserInfo was found successfully", userInfo);
+    const overview = await Overview.findOne({ userId: req.params.id });
+    res.success("UserInfo was found successfully", overview);
   } catch (error) {
     res.fail(error.message);
   }
 }
-
 export async function updateOverview(req, res) {
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {
@@ -49,51 +50,73 @@ export async function updateOverview(req, res) {
 
   const { subject, value, viewer } = req.body;
   try {
-    const userInfo = await UserInfo.findOne({ userId: req.params.id });
-    const findItem = userInfo.overview.find((item) => item.subject == subject);
-    let updatedOverview;
-    if (findItem) {
-      updatedOverview = userInfo.overview.map((i) => {
-        if (i.subject == subject) {
-          return { subject, value, viewer };
-        } else {
-          return i;
-        }
-      });
+    const overview = await Overview.findOne({ userId: req.params.id });
+
+    if (overview) {
+      await Overview.findOneAndUpdate(
+        { userId: req.params.id },
+        { [subject]: { value, viewer } }
+      );
     } else {
-      const overview = userInfo.overview;
-      updatedOverview = [...overview, { subject, value, viewer }];
+      await Overview.create({
+        userId: req.params.id,
+        [subject]: { value, viewer },
+      });
     }
 
-    await UserInfo.findOneAndUpdate(
-      { userId: req.params.id },
-      {
-        overview: updatedOverview,
-      }
-    );
     res.success(" was updated successfully");
   } catch (error) {
     console.log(error.message);
   }
 }
-
 export async function deleteItemOverview(req, res) {
-  console.log("req.body", req.body);
-  console.log("id is", req.params.id);
+  if (req.params.id != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+
   const { subject } = req.body;
-
   try {
-    const findUserInfo = await UserInfo.findOne({ userId: req.params.id });
-    const updatedOverview = findUserInfo.overview.filter(
-      (item) => item.subject != subject
-    );
-
-    await UserInfo.findOneAndUpdate(
+    await Overview.findOneAndUpdate(
       { userId: req.params.id },
-      { overview: updatedOverview }
+      { [subject]: { value: "", viewer: "friends" } }
     );
-    res.success("Overview was updated successfully");
+    res.success(`${subject} was deleted successfully`);
   } catch (error) {
     res.fail(error.message, 500);
+  }
+}
+
+//contactBaseInfo
+export async function getContacUserInfo(req, res) {
+  const isValid = mongoose.isValidObjectId(req.params.id);
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  if (req.params.id != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+
+  try {
+    const contactBaseInfo = await ContactBasicInfo.findOne({
+      userId: req.params.id,
+    });
+    res.success("UserInfo was found successfully", contactBaseInfo);
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
+export async function updateConatctUserInfo(req, res) {
+  if (req.params.id != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+
+  try {
+  } catch (error) {
+    res.fail(error.message);
   }
 }
