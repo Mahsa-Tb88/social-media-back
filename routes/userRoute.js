@@ -17,6 +17,6 @@ router.put("/editOverview/:id", updateOverview);
 router.put("/deleteOverview/:id", deleteItemOverview);
 
 router.get("/contactBaseInfo/:id", getContacUserInfo);
-router.put("/editContact/:id", updateConatctUserInfo);
+router.put("/editContactBaseInfo/:id", updateConatctUserInfo);
 
 export default router;

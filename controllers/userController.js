@@ -110,12 +110,28 @@ export async function getContacUserInfo(req, res) {
 }
 
 export async function updateConatctUserInfo(req, res) {
+  const { subject, viewer, value } = req.body;
   if (req.params.id != req.userId) {
     res.fail("You are not authorized");
     return;
   }
 
   try {
+    const findItem = await ContactBasicInfo.findOne({ userId: req.params.id });
+
+    if (findItem) {
+      const updatee = await ContactBasicInfo.findOneAndUpdate(
+        { userId: req.params.id },
+        { [subject]: { value, viewer } }
+      );
+    } else {
+      const newi = await ContactBasicInfo.create({
+        userId: req.params.id,
+        [subject]: { value, viewer },
+      });
+    }
+
+    res.success("New update was done successfully!");
   } catch (error) {
     res.fail(error.message);
   }
