@@ -3,6 +3,9 @@ import User from "../models/userSchema.js";
 import Overview from "../models/overviewSchema.js";
 import ContactBasicInfo from "../models/contactBaseInfoSchema.js";
 
+import Work from "../models/workSchema.js";
+import Education from "../models/educationSchema.js";
+
 export async function getUserById(req, res) {
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {
@@ -118,7 +121,6 @@ export async function updateConatctUserInfo(req, res) {
 
   try {
     const findItem = await ContactBasicInfo.findOne({ userId: req.params.id });
-
     if (findItem) {
       const updatee = await ContactBasicInfo.findOneAndUpdate(
         { userId: req.params.id },
@@ -136,3 +138,66 @@ export async function updateConatctUserInfo(req, res) {
     res.fail(error.message);
   }
 }
+
+export async function deleteConatctUserInfo(req, res) {
+  if (req.params.id != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+
+  const { subject } = req.body;
+  try {
+    await ContactBasicInfo.findOneAndUpdate(
+      { userId: req.params.id },
+      { [subject]: { value: "", viewer: "friends" } }
+    );
+    res.success(`${subject} was deleted successfully`);
+  } catch (error) {
+    res.fail(error.message, 500);
+  }
+}
+
+//workEducation
+
+export async function getWork(req, res) {
+  const isValid = mongoose.isValidObjectId(req.params.id);
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  if (req.params.id != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+
+  try {
+    const workEducation = await Work.find({ userId: req.params.id });
+    res.success("workEducation was found successfully!", workEducation);
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+export async function updateWork(req, res) {}
+export async function deleteWork(req, res) {}
+
+//education
+export async function getEducation(req, res) {
+  const isValid = mongoose.isValidObjectId(req.params.id);
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  if (req.params.id != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+
+  try {
+    const workEducation = await Education.find({ userId: req.params.id });
+    res.success("workEducation was found successfully!", Education);
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+export async function updateEducation(req, res) {}
+export async function deleteEducation(req, res) {}

@@ -6,6 +6,13 @@ import {
   deleteItemOverview,
   updateConatctUserInfo,
   getContacUserInfo,
+  deleteConatctUserInfo,
+  getWork,
+  updateWork,
+  deleteWork,
+  getEducation,
+  updateEducation,
+  deleteEducation,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -18,5 +25,14 @@ router.put("/deleteOverview/:id", deleteItemOverview);
 
 router.get("/contactBaseInfo/:id", getContacUserInfo);
 router.put("/editContactBaseInfo/:id", updateConatctUserInfo);
+router.put("/deleteContactBaseInfo/:id", deleteConatctUserInfo);
+
+router.get("/work/:id", getWork);
+router.put("/editWork/:id", updateWork);
+router.put("/deleteWork/:id", deleteWork);
+
+router.get("/Education/:id", getEducation);
+router.put("/editEducation/:id", updateEducation);
+router.put("/deleteEducation/:id", deleteEducation);
 
 export default router;

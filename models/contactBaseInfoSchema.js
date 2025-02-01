@@ -6,7 +6,7 @@ const contactBasicInfoSchema = new mongoose.Schema(
     Mobile: { type: Object },
     Email: { type: Object },
     Website: { type: Object },
-    Linkedin: { type: Object },
+    LinkedIn: { type: Object },
     Github: { type: Object },
     Gender: { type: Object },
     Pronouns: { type: Object },
