@@ -171,10 +171,39 @@ export async function getWork(req, res) {
   }
 
   try {
-    const workEducation = await Work.find({ userId: req.params.id });
-    res.success("workEducation was found successfully!", workEducation);
+    const work = await Work.find({ userId: req.params.id });
+
+    res.success("workEducation was found successfully!", work);
   } catch (error) {
+    console.log("error");
     res.fail(error.message);
+  }
+}
+export async function addNewWork(req, res) {
+  const isValid = mongoose.isValidObjectId(req.params.id);
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  if (req.params.id != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+  const { position, company, city, startYear, endYear, isCurrently } = req.body;
+
+  try {
+    const work = await Work.create({
+      userId: req.params.id,
+      position,
+      company,
+      city,
+      startYear,
+      endYear,
+      isCurrently,
+    });
+    res.success("work updated successfully");
+  } catch (error) {
+    res.fail(error.message, 500);
   }
 }
 export async function updateWork(req, res) {}
@@ -191,10 +220,9 @@ export async function getEducation(req, res) {
     res.fail("You are not authorized");
     return;
   }
-
   try {
-    const workEducation = await Education.find({ userId: req.params.id });
-    res.success("workEducation was found successfully!", Education);
+    const education = await Education.find({ userId: req.params.id });
+    res.success("workEducation was found successfully!", education);
   } catch (error) {
     res.fail(error.message);
   }

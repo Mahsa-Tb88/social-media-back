@@ -13,6 +13,7 @@ import {
   getEducation,
   updateEducation,
   deleteEducation,
+  addNewWork,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -28,10 +29,11 @@ router.put("/editContactBaseInfo/:id", updateConatctUserInfo);
 router.put("/deleteContactBaseInfo/:id", deleteConatctUserInfo);
 
 router.get("/work/:id", getWork);
+router.get("/newWork/:id", addNewWork);
 router.put("/editWork/:id", updateWork);
 router.put("/deleteWork/:id", deleteWork);
 
-router.get("/Education/:id", getEducation);
+router.get("/education/:id", getEducation);
 router.put("/editEducation/:id", updateEducation);
 router.put("/deleteEducation/:id", deleteEducation);
 
