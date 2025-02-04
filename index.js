@@ -14,7 +14,6 @@ import { checkToken } from "./middlewares/authMiddleWare.js";
 import miscRoutes from "./routes/miscRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import profileRoutes from "./routes/profleRoutes.js";
-import usersRoutes from "./routes/usersRoutes.js";
 import userRoute from "./routes/userRoute.js";
 import cookieParser from "cookie-parser";
 
@@ -36,8 +35,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/misc", miscRoutes);
 app.use("/auth", authRoutes);
 app.use("/profile", profileRoutes);
-app.use("/users", usersRoutes);
-app.use("/user", userRoute);
+app.use("/users", userRoute);
 
 try {
   await mongoose.connect(process.env.MONGO_URL);

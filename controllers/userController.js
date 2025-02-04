@@ -7,6 +7,15 @@ import Work from "../models/workSchema.js";
 import Education from "../models/educationSchema.js";
 import FamilyRel from "../models/familyRelationship.js";
 
+export async function getAllUsers(req, res) {
+  try {
+    const users = await User.find();
+    const selectedUsers = users.filter((user) => user._id != req.userId);
+    res.success("get all users successfully", selectedUsers);
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
 export async function getUserById(req, res) {
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {
@@ -22,9 +31,17 @@ export async function getUserById(req, res) {
   }
 }
 export async function findUser(req, res) {
+  console.log("paramsss", req.query.user);
+  const username = req.query.user;
+  const query = {
+    $or: [{ username: RegExp(username, "i") }],
+  };
   try {
-    console.log("paramsss", req.params);
-  } catch (error) {}
+    const findUser = await User.find(query);
+    res.success("was found successfully!", findUser);
+  } catch (error) {
+    res.fail(error.message);
+  }
 }
 
 //overview
@@ -376,6 +393,7 @@ export async function getFamilyRel(req, res) {
 
   try {
     const familyRel = await FamilyRel.findOne({ userId: req.params.id });
+
     res.success("it was found successfully!", familyRel);
   } catch (error) {
     res.fail(error.message);
