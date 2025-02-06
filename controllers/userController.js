@@ -31,7 +31,6 @@ export async function getUserById(req, res) {
   }
 }
 export async function findUser(req, res) {
-  console.log("paramsss", req.query.user);
   const username = req.query.user;
   const query = {
     $or: [{ username: RegExp(username, "i") }],
@@ -213,7 +212,6 @@ export async function addNewWork(req, res) {
     return;
   }
   const { position, company, city, startYear, endYear, isCurrently } = req.body;
-  console.log(req.body);
 
   try {
     const work = await Work.create({
@@ -312,7 +310,6 @@ export async function addEducation(req, res) {
   }
   const { field, degree, university, startYear, endYear, isCurrently } =
     req.body;
-  console.log(req.body);
 
   try {
     const work = await Education.create({
@@ -362,7 +359,6 @@ export async function updateEducation(req, res) {
   }
 }
 export async function deleteEducation(req, res) {
-  console.log("req.params", req.params.id);
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {
     res.fail("This User Id is not valid!");
@@ -395,6 +391,68 @@ export async function getFamilyRel(req, res) {
     const familyRel = await FamilyRel.findOne({ userId: req.params.id });
 
     res.success("it was found successfully!", familyRel);
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
+export async function updateRelationship(req, res) {
+  const userId = req.params.id;
+  const isValid = mongoose.isValidObjectId(req.params.id);
+
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  if (userId != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+  const findUser = await FamilyRel.findOne({ userId });
+  if (findUser) {
+    await FamilyRel.findOneAndUpdate(
+      { userId },
+      { relationship: req.body.relationship }
+    );
+  } else {
+    await FamilyRel.create({ userId, relationship: req.body.relationship });
+  }
+
+  res.success("Relationship was updated successfully!");
+  try {
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
+export async function updatedFamily(req, res) {
+  const userId = req.params.id;
+  const isValid = mongoose.isValidObjectId(req.params.id);
+
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  if (userId != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+  const findUser = await FamilyRel.findOne({ userId });
+  if (findUser) {
+    const updatedFamily = findUser.family.map((f) => {
+      if (f._id == req.body.family._id) {
+        return req.body.family;
+      } else {
+        return f;
+      }
+    });
+    await FamilyRel.findOneAndUpdate({ userId }, { family: updatedFamily });
+  } else {
+    await FamilyRel.create({ userId, family: [req.body.family] });
+  }
+
+  res.success("Family was updated successfully!");
+  try {
   } catch (error) {
     res.fail(error.message);
   }

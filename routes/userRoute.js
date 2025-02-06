@@ -14,14 +14,15 @@ import {
   updateEducation,
   deleteEducation,
   addNewWork,
+  updateRelationship,
   addEducation,
   getFamilyRel,
   findUser,
-  getAllUsers
+  getAllUsers,
+  updatedFamily,
 } from "../controllers/userController.js";
 
 const router = express.Router();
-
 
 router.get("/", getAllUsers);
 router.get("/:id", getUserById);
@@ -46,5 +47,7 @@ router.put("/editEducation/:id", updateEducation);
 router.put("/deleteEducation/:id", deleteEducation);
 
 router.get("/familyRel/:id", getFamilyRel);
+router.put("/relationship/:id", updateRelationship);
+router.put("/family/:id", updatedFamily);
 
 export default router;
