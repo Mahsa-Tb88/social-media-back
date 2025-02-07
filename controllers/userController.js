@@ -408,6 +408,7 @@ export async function updateRelationship(req, res) {
     res.fail("You are not authorized");
     return;
   }
+
   const findUser = await FamilyRel.findOne({ userId });
   if (findUser) {
     await FamilyRel.findOneAndUpdate(
@@ -420,6 +421,28 @@ export async function updateRelationship(req, res) {
 
   res.success("Relationship was updated successfully!");
   try {
+  } catch (error) {
+    console.log(error);
+    res.fail(error.message);
+  }
+}
+
+export async function deleteRelationship(req, res) {
+
+  const userId = req.params.id;
+  const isValid = mongoose.isValidObjectId(req.params.id);
+
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  if (userId != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+  try {
+    await FamilyRel.findOneAndUpdate({ userId }, { relationship: {} });
+    res.success("Relationship was deleted successfully!");
   } catch (error) {
     res.fail(error.message);
   }
