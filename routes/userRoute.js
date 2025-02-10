@@ -21,6 +21,7 @@ import {
   getAllUsers,
   updatedFamily,
   deleteRelationship,
+  deleteFamilyMember
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -50,6 +51,7 @@ router.put("/deleteEducation/:id", deleteEducation);
 router.get("/familyRel/:id", getFamilyRel);
 router.put("/relationship/:id", updateRelationship);
 router.delete("/relationship/:id", deleteRelationship);
+router.put("/familyMember/:id", deleteFamilyMember);
 
 router.put("/family/:id", updatedFamily);
 

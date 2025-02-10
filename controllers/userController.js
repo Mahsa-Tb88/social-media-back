@@ -428,7 +428,6 @@ export async function updateRelationship(req, res) {
 }
 
 export async function deleteRelationship(req, res) {
-
   const userId = req.params.id;
   const isValid = mongoose.isValidObjectId(req.params.id);
 
@@ -461,21 +460,60 @@ export async function updatedFamily(req, res) {
     return;
   }
   const findUser = await FamilyRel.findOne({ userId });
+  let updatedFamily;
   if (findUser) {
-    const updatedFamily = findUser.family.map((f) => {
-      if (f._id == req.body.family._id) {
-        return req.body.family;
+    if (findUser.family.length) {
+      const findFamilyMember = await FamilyRel.findById(req.body.family.id);
+      if (findFamilyMember) {
+        updatedFamily = findUser.family.map((f) => {
+          if (f.id == req.body.family.id) {
+            return req.body.family;
+          } else {
+            return f;
+          }
+        });
       } else {
-        return f;
+        await FamilyRel.findOneAndUpdate(
+          { userId },
+          { family: [...findUser.family, req.body.family] }
+        );
       }
-    });
+    } else {
+      updatedFamily = [req.body.family];
+    }
     await FamilyRel.findOneAndUpdate({ userId }, { family: updatedFamily });
   } else {
-    await FamilyRel.create({ userId, family: [req.body.family] });
+    const family = [req.body.family];
+    await FamilyRel.create({ userId, family });
   }
 
   res.success("Family was updated successfully!");
   try {
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
+export async function deleteFamilyMember(req, res) {
+  const userId = req.params.id;
+  const isValid = mongoose.isValidObjectId(req.params.id);
+
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  try {
+    const findUser = await FamilyRel.findOne({ userId });
+    console.log("mmm", findUser, req.body);
+
+    const updatedFamilyMember = findUser.family.filter(
+      (user) => user.id != req.body.userId
+    );
+    await FamilyRel.findOneAndUpdate(
+      { userId },
+      { family: updatedFamilyMember }
+    );
+    res.success(" The family member was deleted successfully");
   } catch (error) {
     res.fail(error.message);
   }
