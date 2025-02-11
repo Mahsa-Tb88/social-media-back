@@ -6,6 +6,7 @@ import ContactBasicInfo from "../models/contactBaseInfoSchema.js";
 import Work from "../models/workSchema.js";
 import Education from "../models/educationSchema.js";
 import FamilyRel from "../models/familyRelationship.js";
+import PlaceLived from "../models/placeLived.js";
 
 export async function getAllUsers(req, res) {
   try {
@@ -447,7 +448,33 @@ export async function deleteRelationship(req, res) {
   }
 }
 
-export async function updatedFamily(req, res) {
+export async function addFamily(req, res) {
+  const userId = req.params.id;
+  const isValid = mongoose.isValidObjectId(req.params.id);
+
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+
+  try {
+    const findUser = await FamilyRel.findOne({ userId });
+
+    if (findUser) {
+      await FamilyRel.findOneAndUpdate(
+        { userId },
+        { family: [...findUser.family, req.body.family] }
+      );
+    } else {
+      await FamilyRel.create({ userId, family: req.body.family });
+    }
+    res.success("new family was added successfully!");
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
+export async function editFamily(req, res) {
   const userId = req.params.id;
   const isValid = mongoose.isValidObjectId(req.params.id);
 
@@ -459,36 +486,22 @@ export async function updatedFamily(req, res) {
     res.fail("You are not authorized");
     return;
   }
-  const findUser = await FamilyRel.findOne({ userId });
-  let updatedFamily;
-  if (findUser) {
-    if (findUser.family.length) {
-      const findFamilyMember = await FamilyRel.findById(req.body.family.id);
-      if (findFamilyMember) {
-        updatedFamily = findUser.family.map((f) => {
-          if (f.id == req.body.family.id) {
-            return req.body.family;
-          } else {
-            return f;
-          }
-        });
-      } else {
-        await FamilyRel.findOneAndUpdate(
-          { userId },
-          { family: [...findUser.family, req.body.family] }
-        );
-      }
-    } else {
-      updatedFamily = [req.body.family];
-    }
-    await FamilyRel.findOneAndUpdate({ userId }, { family: updatedFamily });
-  } else {
-    const family = [req.body.family];
-    await FamilyRel.create({ userId, family });
-  }
 
-  res.success("Family was updated successfully!");
   try {
+    const findUser = await FamilyRel.findOne({ userId });
+    const updatedFamilyMembers = findUser.family.map((m) => {
+      if (m.id == req.body.userUpdatedId) {
+        return { ...m, status: req.body.status };
+      } else {
+        return m;
+      }
+    });
+
+    await FamilyRel.findOneAndUpdate(
+      { userId },
+      { family: updatedFamilyMembers }
+    );
+    res.success("Family member was updated successfully!");
   } catch (error) {
     res.fail(error.message);
   }
@@ -504,16 +517,117 @@ export async function deleteFamilyMember(req, res) {
   }
   try {
     const findUser = await FamilyRel.findOne({ userId });
-    console.log("mmm", findUser, req.body);
 
     const updatedFamilyMember = findUser.family.filter(
-      (user) => user.id != req.body.userId
+      (user) => user.id != req.body.userDeleteId
     );
     await FamilyRel.findOneAndUpdate(
       { userId },
       { family: updatedFamilyMember }
     );
     res.success(" The family member was deleted successfully");
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
+//place lived
+export async function getPlaceLived(req, res) {
+  const userId = req.params.id;
+  const isValid = mongoose.isValidObjectId(req.params.id);
+
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  try {
+    const places = await PlaceLived.findOne({ userId });
+    res.success("Place was found successfully!", places);
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
+export async function addPlace(req, res) {
+  const userId = req.params.id;
+  const isValid = mongoose.isValidObjectId(req.params.id);
+
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  const { hometown, currentCity, usedToLiveCity } = req.body;
+  try {
+    const places = await PlaceLived.findOne({ userId });
+
+    if (places) {
+      if (hometown) {
+        await PlaceLived.findOneAndUpdate({ userId }, { hometown });
+      } else if (currentCity) {
+        await PlaceLived.findOneAndUpdate({ userId }, { currentCity });
+      } else {
+        await PlaceLived.findOneAndUpdate(
+          { userId },
+          { usedToLiveCity: [...places.usedToLiveCity, usedToLiveCity] }
+        );
+      }
+    } else {
+      await PlaceLived.create({
+        userId,
+        hometown,
+        currentCity,
+        usedToLiveCity: usedToLiveCity ? [usedToLiveCity] : [],
+      });
+    }
+
+    res.success("Place was found successfully!", places);
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
+export async function editPlace(req, res) {
+  const userId = req.params.id;
+  const isValid = mongoose.isValidObjectId(req.params.id);
+
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+
+  try {
+    const places = await PlaceLived.findOne({ userId });
+    res.success("Place was found successfully!", places);
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
+export async function deletePlace(req, res) {
+  const userId = req.params.id;
+  const isValid = mongoose.isValidObjectId(req.params.id);
+
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+
+  try {
+    const places = await PlaceLived.findOne({ userId });
+    if (req.body.title == "hometown") {
+      await PlaceLived.findOneAndUpdate({ userId }, { hometown: {} });
+    } else if (req.body.title == "currentCity") {
+      await PlaceLived.findOneAndUpdate({ userId }, { currentCity: {} });
+    } else {
+      const updatedPlace = places.usedToLiveCity.filter(
+        (item) => req.body.titleId != item.id
+      );
+      await PlaceLived.findOneAndUpdate(
+        { userId },
+        { usedToLiveCity: updatedPlace }
+      );
+    }
+    res.success("Place was found successfully!", places);
   } catch (error) {
     res.fail(error.message);
   }

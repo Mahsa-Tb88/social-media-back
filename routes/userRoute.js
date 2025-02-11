@@ -19,9 +19,14 @@ import {
   getFamilyRel,
   findUser,
   getAllUsers,
-  updatedFamily,
   deleteRelationship,
-  deleteFamilyMember
+  deleteFamilyMember,
+  addFamily,
+  editFamily,
+  getPlaceLived,
+  addPlace,
+  deletePlace,
+  editPlace,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -49,10 +54,17 @@ router.put("/editEducation/:id", updateEducation);
 router.put("/deleteEducation/:id", deleteEducation);
 
 router.get("/familyRel/:id", getFamilyRel);
-router.put("/relationship/:id", updateRelationship);
-router.delete("/relationship/:id", deleteRelationship);
-router.put("/familyMember/:id", deleteFamilyMember);
 
-router.put("/family/:id", updatedFamily);
+router.put("/editRelationship/:id", updateRelationship);
+router.delete("/deleteRelationship/:id", deleteRelationship);
+
+router.put("/deleteFamilyMember/:id", deleteFamilyMember);
+router.put("/addFamily/:id", addFamily);
+router.put("/editFamily/:id", editFamily);
+
+router.get("/userPlaces/:id", getPlaceLived);
+router.put("/addPlace/:id", addPlace);
+router.put("/deletePlace/:id", deletePlace);
+router.put("/editPlace/:id", editPlace);
 
 export default router;
