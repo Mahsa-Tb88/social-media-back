@@ -594,10 +594,37 @@ export async function editPlace(req, res) {
     res.fail("This User Id is not valid!");
     return;
   }
-
+  const { hometown, currentCity, usedToLiveCity } = req.body;
   try {
     const places = await PlaceLived.findOne({ userId });
-    res.success("Place was found successfully!", places);
+
+    if (hometown) {
+      await PlaceLived.findOneAndUpdate(
+        { userId },
+        { hometown: { ...places.hometown, value: hometown.value } }
+      );
+    }
+    if (currentCity) {
+      await PlaceLived.findOneAndUpdate(
+        { userId },
+        { hometown: { ...places.currentCity, value: currentCity.value } }
+      );
+    }
+    if (usedToLiveCity) {
+      const updatedUsedToLiveCity = places.usedToLiveCity.map((c) => {
+        if (c.id == usedToLiveCity.id) {
+          return { ...c, value: usedToLiveCity.value };
+        } else {
+          return c;
+        }
+      });
+
+      await PlaceLived.findOneAndUpdate(
+        { userId },
+        { usedToLiveCity: updatedUsedToLiveCity }
+      );
+    }
+    res.success("Place was found successfully!");
   } catch (error) {
     res.fail(error.message);
   }
