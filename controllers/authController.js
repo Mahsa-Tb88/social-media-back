@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userSchema.js";
 import bcrypt from "bcrypt";
-import Overview from "../models/overviewSchema.js";
+import Friend from "../models/friendSchema.js";
 
 export async function loginUser(req, res) {
   const { username, password, remember } = req.body;
@@ -34,7 +34,14 @@ export async function loginUser(req, res) {
     res.cookie("token", token, settings);
     user.password = undefined;
 
-    res.success("Login Successfully", { user });
+    //find user's friends
+    let friends;
+    friends = await Friend.findOne({ userId: user._id.toString() });
+    if (!friends) {
+      friends = [];
+    }
+
+    res.success("Login Successfully", { user, friends });
   } catch (error) {
     res.fail(error.message);
   }

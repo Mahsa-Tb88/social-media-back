@@ -7,6 +7,7 @@ import Work from "../models/workSchema.js";
 import Education from "../models/educationSchema.js";
 import FamilyRel from "../models/familyRelationship.js";
 import PlaceLived from "../models/placeLived.js";
+import Friend from "../models/friendSchema.js";
 
 export async function getAllUsers(req, res) {
   try {
@@ -39,6 +40,29 @@ export async function findUser(req, res) {
   try {
     const findUser = await User.find(query);
     res.success("was found successfully!", findUser);
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
+export async function findUserFriedns(req, res) {
+  const isValid = mongoose.isValidObjectId(req.params.id);
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  if (req.params.id != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+
+  try {
+    let friends;
+    friends = await Friend.findOne({ userId: req.params.id });
+    if (!friends) {
+      friends = [];
+    }
+    res.success("Friends were found successfully!", friends);
   } catch (error) {
     res.fail(error.message);
   }
