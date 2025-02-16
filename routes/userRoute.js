@@ -27,6 +27,7 @@ import {
   addPlace,
   deletePlace,
   editPlace,
+  makeFriend,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -66,5 +67,7 @@ router.get("/userPlaces/:id", getPlaceLived);
 router.put("/addPlace/:id", addPlace);
 router.put("/deletePlace/:id", deletePlace);
 router.put("/editPlace/:id", editPlace);
+
+router.put("/addFriend/:userId", makeFriend);
 
 export default router;

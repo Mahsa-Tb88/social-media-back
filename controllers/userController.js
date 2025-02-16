@@ -68,6 +68,50 @@ export async function findUserFriedns(req, res) {
   }
 }
 
+export async function makeFriend(req, res) {
+  const isValid = mongoose.isValidObjectId(req.params.id);
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  const { userId, id, username, profileImg, status } = req.body;
+  try {
+    const findUser = await Friend.findOne({ userId });
+    if (findUser) {
+      findfriend = Friend.listFriend.find((f) => f.id == id);
+      let updatedListFriend;
+      if (findUser) {
+        updatedListFriend = Friend.listFriend.map((f) => {
+          if (f.id == id) {
+            return { ...f, status };
+          } else {
+            f;
+          }
+        });
+      } else {
+        updatedListFriend = [
+          ...findUser.listFriend,
+          { id, username, profileImg, status },
+        ];
+      }
+
+      await Friend.findOneAndUpdate(
+        { userId },
+        { listFriend: updatedListFriend }
+      );
+    } else {
+      await Friend.create({
+        userId,
+        listFriend: [{ id, username, profileImg, status }],
+        viewer: "friends",
+      });
+    }
+    res.success("user was added to list of friends successfully!");
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
 //overview
 export async function getOverview(req, res) {
   const isValid = mongoose.isValidObjectId(req.params.id);
