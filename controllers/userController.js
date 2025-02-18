@@ -69,7 +69,9 @@ export async function findUserFriedns(req, res) {
 }
 
 export async function makeFriend(req, res) {
-  const isValid = mongoose.isValidObjectId(req.params.id);
+  console.log("req.body", req.body);
+  console.log("req.params", req.params.userId);
+  const isValid = mongoose.isValidObjectId(req.params.userId);
   if (!isValid) {
     res.fail("This User Id is not valid!");
     return;

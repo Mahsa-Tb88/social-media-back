@@ -1,4 +1,5 @@
 import Category from "../models/categoryScheme.js";
+import Friend from "../models/friendSchema.js";
 import User from "../models/userSchema.js";
 
 export async function initialize(req, res) {
@@ -10,7 +11,13 @@ export async function initialize(req, res) {
     if (req.username) {
       user = await User.findOne({ username: req.username });
       user.password = undefined;
-      res.success("Initialized successfully!", { categories, user });
+      //find user's friends
+      let friends;
+      friends = await Friend.findOne({ userId: user._id.toString() });
+      if (!friends) {
+        friends = { listFriend: [], viewer: "friends" };
+      }
+      res.success("Initialized successfully!", { categories, user, friends });
     } else {
       res.success("Initialized successfully!", { categories });
     }
