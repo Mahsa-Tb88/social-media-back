@@ -69,8 +69,6 @@ export async function findUserFriedns(req, res) {
 }
 
 export async function makeFriend(req, res) {
-  console.log("req.body", req.body);
-  console.log("req.params", req.params.userId);
   const isValid = mongoose.isValidObjectId(req.params.userId);
   if (!isValid) {
     res.fail("This User Id is not valid!");
@@ -80,9 +78,10 @@ export async function makeFriend(req, res) {
   try {
     const findUser = await Friend.findOne({ userId });
     if (findUser) {
-      findfriend = Friend.listFriend.find((f) => f.id == id);
+      const findFriend = findUser.listFriend.find((f) => f.id == id);
+
       let updatedListFriend;
-      if (findUser) {
+      if (findFriend) {
         updatedListFriend = Friend.listFriend.map((f) => {
           if (f.id == id) {
             return { ...f, status };
@@ -110,6 +109,7 @@ export async function makeFriend(req, res) {
     }
     res.success("user was added to list of friends successfully!");
   } catch (error) {
+    console.log("errorrrr", error.message);
     res.fail(error.message);
   }
 }
