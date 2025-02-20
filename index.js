@@ -13,8 +13,16 @@ import { checkToken } from "./middlewares/authMiddleWare.js";
 
 import miscRoutes from "./routes/miscRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+
 import profileRoutes from "./routes/profleRoutes.js";
 import userRoute from "./routes/userRoute.js";
+import overviewRoutes from "./routes/overviewRoutes.js";
+import workRoutes from "./routes/workRoutes.js";
+import infoRoutes from "./routes/infoRoutes.js";
+import educationRoutes from "./routes/educationRoutes.js";
+import friendRoutes from "./routes/friendRoutes.js";
+import placeRoutes from "./routes/placeRoutes.js";
+
 import cookieParser from "cookie-parser";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -36,6 +44,14 @@ app.use("/misc", miscRoutes);
 app.use("/auth", authRoutes);
 app.use("/profile", profileRoutes);
 app.use("/users", userRoute);
+app.use("/overviews", overviewRoutes);
+app.use("/infos", infoRoutes);
+app.use("/works", workRoutes);
+app.use("/educations", educationRoutes);
+app.use("/relationships", educationRoutes);
+app.use("/families", educationRoutes);
+app.use("/places", placeRoutes);
+app.use("/friends", friendRoutes);
 
 try {
   await mongoose.connect(process.env.MONGO_URL);

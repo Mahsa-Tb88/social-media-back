@@ -4,6 +4,7 @@ const friend = new mongoose.Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     listFriend: { type: Array, default: [] },
+    friendRequestList: { type: Array, default: [] },
     viewer: { type: String, default: "private" },
   },
 
