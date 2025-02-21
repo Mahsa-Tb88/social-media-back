@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import Friend from "../models/friendSchema.js";
-import User from "../models/userSchema.js";
 
 export async function makeFriend(req, res) {
   const isValid = mongoose.isValidObjectId(req.params.userId);
@@ -19,15 +18,24 @@ export async function makeFriend(req, res) {
   } = req.body;
   try {
     const findUserGetRequest = await Friend.findOne({ userId: id });
-    const updatedFriendRequestList = [
-      ...findUserGetRequest.friendRequestList,
-      { id: userId, profileImg: userProfileImg, username: userUsername },
-    ];
+    if (findUserGetRequest) {
+      const updatedFriendRequestList = [
+        ...findUserGetRequest.friendRequestList,
+        { id: userId, profileImg: userProfileImg, username: userUsername },
+      ];
 
-    await Friend.findOneAndUpdate(
-      { userId: id },
-      { friendRequestList: updatedFriendRequestList }
-    );
+      await Friend.findOneAndUpdate(
+        { userId: id },
+        { friendRequestList: updatedFriendRequestList }
+      );
+    } else {
+      await Friend.create({
+        userId: id,
+        friendRequestList: [
+          { id: userId, profileImg: userProfileImg, username: userUsername },
+        ],
+      });
+    }
 
     const findUser = await Friend.findOne({ userId });
     if (findUser) {
@@ -78,7 +86,7 @@ export async function removeFriend(req, res) {
   try {
     //delete request friend if there is
     const findUserGotRequest = await Friend.findOne({ userId: id });
-    const findUsersentRequest = findUserGotRequest.friendRequestList.find(
+    const findUsersentRequest = findUserGotRequest?.friendRequestList.find(
       (f) => f.id == userId
     );
     if (findUsersentRequest) {
@@ -102,3 +110,5 @@ export async function removeFriend(req, res) {
     res.fail(error.message);
   }
 }
+
+

@@ -41,6 +41,7 @@ export async function loginUser(req, res) {
       friends = [];
     }
 
+
     res.success("Login Successfully", { user, friends });
   } catch (error) {
     res.fail(error.message);
