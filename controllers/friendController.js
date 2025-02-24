@@ -7,16 +7,10 @@ export async function makeFriend(req, res) {
     res.fail("This User Id is not valid!");
     return;
   }
-  const {
-    userId,
-    userProfileImg,
-    userUsername,
-    id,
-    username,
-    profileImg,
-    status,
-  } = req.body;
+  const { userId, userProfileImg, userUsername, id, username, profileImg } =
+    req.body;
   try {
+    // add user who sent request to FriendRequestList of user got request
     const findUserGetRequest = await Friend.findOne({ userId: id });
     if (findUserGetRequest) {
       const updatedFriendRequestList = [
@@ -36,25 +30,13 @@ export async function makeFriend(req, res) {
         ],
       });
     }
-
+    // add user who got request to listfriend of user sent request
     const findUser = await Friend.findOne({ userId });
     if (findUser) {
-      const findFriend = findUser.listFriend.find((f) => f.id == id);
-      let updatedListFriend;
-      if (findFriend) {
-        updatedListFriend = Friend.listFriend.map((f) => {
-          if (f.id == id) {
-            return { ...f, status };
-          } else {
-            f;
-          }
-        });
-      } else {
-        updatedListFriend = [
-          ...findUser.listFriend,
-          { id, username, profileImg, status },
-        ];
-      }
+      const updatedListFriend = [
+        ...findUser.listFriend,
+        { id, username, profileImg, status: "pending" },
+      ];
 
       await Friend.findOneAndUpdate(
         { userId },
@@ -69,6 +51,53 @@ export async function makeFriend(req, res) {
     }
 
     res.success("user was added to list of friends successfully!");
+  } catch (error) {
+    console.log("errorrrr", error.message);
+    res.fail(error.message);
+  }
+}
+
+export async function confirmFriend(req, res) {
+  const isValid = mongoose.isValidObjectId(req.params.userId);
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+
+  const { id, username, profileImg, userId } = req.body;
+
+  try {
+    //add user who sent request to listfriend of user who got request
+    const findUser1 = await Friend.findOne({ userId });
+    const updatedRequestList = findUser1.friendRequestList.filter(
+      (f) => f.id != id
+    );
+    await Friend.findOneAndUpdate(
+      { userId },
+      {
+        listFriend: [
+          ...findUser1.listFriend,
+          { id, username, profileImg, status: "accepted" },
+        ],
+        friendRequestList: updatedRequestList,
+      }
+    );
+
+    //add the user who got request to listFriend of user who sent request
+    const findUser2 = await Friend.findOne({ userId: id });
+    const updatedListFriend = findUser2.listFriend.map((f) => {
+      if (f.id == userId) {
+        return { ...f, status: "accepted" };
+      } else {
+        f;
+      }
+    });
+    await Friend.findOneAndUpdate(
+      { userId: id },
+      { listFriend: updatedListFriend }
+    );
+
+    res.success("New friend was made successfully!");
   } catch (error) {
     console.log("errorrrr", error.message);
     res.fail(error.message);
@@ -110,5 +139,3 @@ export async function removeFriend(req, res) {
     res.fail(error.message);
   }
 }
-
-
