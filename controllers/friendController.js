@@ -45,7 +45,7 @@ export async function makeFriend(req, res) {
     } else {
       await Friend.create({
         userId,
-        listFriend: [{ id, username, profileImg, status }],
+        listFriend: [{ id, username, profileImg, status: "pending" }],
         viewer: "friends",
       });
     }
