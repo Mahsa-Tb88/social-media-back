@@ -67,7 +67,7 @@ export async function confirmFriend(req, res) {
   const { id, username, profileImg, userId } = req.body;
 
   try {
-    //add user who sent request to listfriend of user who got request
+    //add user who sent request to listfriend of user who accept request
     const findUser1 = await Friend.findOne({ userId });
     const updatedRequestList = findUser1.friendRequestList.filter(
       (f) => f.id != id
@@ -83,7 +83,7 @@ export async function confirmFriend(req, res) {
       }
     );
 
-    //add the user who got request to listFriend of user who sent request
+    //add the user who accept request to listFriend of user who sent request
     const findUser2 = await Friend.findOne({ userId: id });
     const updatedListFriend = findUser2.listFriend.map((f) => {
       if (f.id == userId) {
@@ -104,8 +104,8 @@ export async function confirmFriend(req, res) {
   }
 }
 
-export async function removeFriend(req, res) {
-  //cancel request or delete friend
+export async function removeRequestFriend(req, res) {
+  //cancel request or delete request friend
   const isValid = mongoose.isValidObjectId(req.params.userId);
   if (!isValid) {
     res.fail("This User Id is not valid!");
@@ -113,7 +113,7 @@ export async function removeFriend(req, res) {
   }
   const { id, userId } = req.body;
   try {
-    //delete request friend if there is
+    //delete request
     const findUserGotRequest = await Friend.findOne({ userId: id });
     const findUsersentRequest = findUserGotRequest?.friendRequestList.find(
       (f) => f.id == userId
@@ -127,12 +127,44 @@ export async function removeFriend(req, res) {
         { friendRequestList: updatedList }
       );
     }
+
     const findUser = await Friend.findOne({ userId });
     const updatedListFriend = findUser.listFriend.filter((f) => f.id != id);
 
     await Friend.findOneAndUpdate(
       { userId },
       { listFriend: updatedListFriend }
+    );
+    res.success("friend was removed successfully!");
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
+export async function removeFriend(req, res) {
+  //cancel request or delete request friend
+  const isValid = mongoose.isValidObjectId(req.params.userId);
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  const { id, userId } = req.body;
+  try {
+    const findUser1 = await Friend.findOne({ userId: id });
+    const updatedListFriend1 = findUser1.listFriend.filter(
+      (f) => f.id != userId
+    );
+    await Friend.findOneAndUpdate(
+      { userId:id },
+      { listFriend: updatedListFriend1 }
+    );
+
+
+    const findUser2 = await Friend.findOne({ userId });
+    const updatedListFriend2 = findUser2.listFriend.filter((f) => f.id != id);
+    await Friend.findOneAndUpdate(
+      { userId },
+      { listFriend: updatedListFriend2 }
     );
     res.success("friend was removed successfully!");
   } catch (error) {

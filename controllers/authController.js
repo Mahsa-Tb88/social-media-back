@@ -36,11 +36,13 @@ export async function loginUser(req, res) {
 
     //find user's friends
     let friends;
-    friends = await Friend.findOne({ userId: user._id.toString() });
-    if (!friends) {
-      friends = [];
-    }
-
+    const findFriends = await Friend.findOne({ userId: user._id.toString() });
+    friends = {
+      listFriend: findFriends?.listFriend || [],
+      friendRequestList: findFriends?.friendRequestList || [],
+      viewer: findFriends?.viewer,
+      userId: findFriends?.userId,
+    };
 
     res.success("Login Successfully", { user, friends });
   } catch (error) {
