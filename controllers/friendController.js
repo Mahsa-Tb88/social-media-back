@@ -9,6 +9,7 @@ export async function makeFriend(req, res) {
   }
   const { userId, userProfileImg, userUsername, id, username, profileImg } =
     req.body;
+
   try {
     // add user who sent request to FriendRequestList of user got request
     const findUserGetRequest = await Friend.findOne({ userId: id });
@@ -65,7 +66,6 @@ export async function confirmFriend(req, res) {
   }
 
   const { id, username, profileImg, userId } = req.body;
-
   try {
     //add user who sent request to listfriend of user who accept request
     const findUser1 = await Friend.findOne({ userId });
@@ -85,11 +85,12 @@ export async function confirmFriend(req, res) {
 
     //add the user who accept request to listFriend of user who sent request
     const findUser2 = await Friend.findOne({ userId: id });
+    console.log("findUser2--->", findUser2);
     const updatedListFriend = findUser2.listFriend.map((f) => {
       if (f.id == userId) {
         return { ...f, status: "accepted" };
       } else {
-        f;
+        return f;
       }
     });
     await Friend.findOneAndUpdate(
@@ -112,6 +113,7 @@ export async function removeRequestFriend(req, res) {
     return;
   }
   const { id, userId } = req.body;
+  console.log("req.body", req.body);
   try {
     //delete request
     const findUserGotRequest = await Friend.findOne({ userId: id });
@@ -155,10 +157,9 @@ export async function removeFriend(req, res) {
       (f) => f.id != userId
     );
     await Friend.findOneAndUpdate(
-      { userId:id },
+      { userId: id },
       { listFriend: updatedListFriend1 }
     );
-
 
     const findUser2 = await Friend.findOne({ userId });
     const updatedListFriend2 = findUser2.listFriend.filter((f) => f.id != id);
