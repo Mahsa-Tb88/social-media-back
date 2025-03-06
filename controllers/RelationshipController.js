@@ -20,7 +20,6 @@ export async function getFamilyRel(req, res) {
 export async function updateRelationship(req, res) {
   const userId = req.params.id;
   const isValid = mongoose.isValidObjectId(req.params.id);
-
   if (!isValid) {
     res.fail("This User Id is not valid!");
     return;
