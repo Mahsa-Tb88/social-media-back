@@ -5,6 +5,7 @@ import {
   deleteWork,
   getWork,
   updateWork,
+  filterViewer,
 } from "../controllers/workController.js";
 
 const router = express.Router();
@@ -13,4 +14,5 @@ router.get("/:id", getWork);
 router.put("/new/:id", addNewWork);
 router.put("/edit/:id", updateWork);
 router.delete("/delete/:id", deleteWork);
+router.put("/viewer/:id", filterViewer);
 export default router;

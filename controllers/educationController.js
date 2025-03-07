@@ -97,3 +97,28 @@ export async function deleteEducation(req, res) {
     res.fail(error.message);
   }
 }
+export async function filterViewer(req, res) {
+  const id = req.params.id;
+
+  const isValid = mongoose.isValidObjectId(id);
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+
+  if (id != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+  const { subject, viewer } = req.body;
+  try {
+    const education = await Education.findOne({ userId: id });
+    await Education.findOneAndUpdate(
+      { userId: id },
+      { [subject]: { ...education[subject], viewer } }
+    );
+    res.success("Filter viewer is applied successfully!");
+  } catch (error) {
+    res.fail(error.message);
+  }
+}

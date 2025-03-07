@@ -3,6 +3,7 @@ import {
   deleteConatctUserInfo,
   getContacUserInfo,
   updateConatctUserInfo,
+  filterViewer,
 } from "../controllers/infosController.js";
 
 const router = express.Router();
@@ -10,4 +11,5 @@ const router = express.Router();
 router.get("/:id", getContacUserInfo);
 router.put("/edit/:id", updateConatctUserInfo);
 router.put("/delete/:id", deleteConatctUserInfo);
+router.put("/viewer/:id", filterViewer);
 export default router;
