@@ -66,3 +66,27 @@ export async function deleteRelationship(req, res) {
     res.fail(error.message);
   }
 }
+export async function filterViewer(req, res) {
+  const id = req.params.id;
+  const isValid = mongoose.isValidObjectId(id);
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+
+  if (id != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+  const { viewer } = req.body;
+  try {
+    const user = await FamilyRel.findOne({ userId: id });
+    await FamilyRel.findOneAndUpdate(
+      { userId: id },
+      { relationship: { ...user.relationship, viewer } }
+    );
+    res.success("Filter viewer is applied successfully!");
+  } catch (error) {
+    res.fail(error.message);
+  }
+}

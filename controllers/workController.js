@@ -102,7 +102,6 @@ export async function deleteWork(req, res) {
 }
 export async function filterViewer(req, res) {
   const id = req.params.id;
-
   const isValid = mongoose.isValidObjectId(id);
   if (!isValid) {
     res.fail("This User Id is not valid!");
@@ -113,13 +112,9 @@ export async function filterViewer(req, res) {
     res.fail("You are not authorized");
     return;
   }
-  const { subject, viewer } = req.body;
+  const { viewer, itemId } = req.body;
   try {
-    const work = await Work.findOne({ userId: id });
-    await Work.findOneAndUpdate(
-      { userId: id },
-      { [subject]: { ...work[subject], viewer } }
-    );
+    await Work.findByIdAndUpdate(itemId, { viewer });
     res.success("Filter viewer is applied successfully!");
   } catch (error) {
     res.fail(error.message);

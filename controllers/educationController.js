@@ -110,13 +110,10 @@ export async function filterViewer(req, res) {
     res.fail("You are not authorized");
     return;
   }
-  const { subject, viewer } = req.body;
+  const { itemId, viewer } = req.body;
   try {
-    const education = await Education.findOne({ userId: id });
-    await Education.findOneAndUpdate(
-      { userId: id },
-      { [subject]: { ...education[subject], viewer } }
-    );
+    await Education.findByIdAndUpdate(itemId, { viewer });
+
     res.success("Filter viewer is applied successfully!");
   } catch (error) {
     res.fail(error.message);

@@ -128,3 +128,48 @@ export async function deletePlace(req, res) {
     res.fail(error.message);
   }
 }
+
+export async function filterViewer(req, res) {
+  const id = req.params.id;
+  const isValid = mongoose.isValidObjectId(id);
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  if (id != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+  const { viewer, itemId, title } = req.body;
+  try {
+    const user = await PlaceLived.findOne({ userId: id });
+    if (title == "hometown") {
+      await PlaceLived.findOneAndUpdate(
+        { userId: id },
+        { hometown: { ...user.hometown, viewer } }
+      );
+    } else if (title == "currentCity") {
+      await PlaceLived.findOneAndUpdate(
+        { userId: id },
+        { currentCity: { ...user.currentCity, viewer } }
+      );
+    } else {
+      const updated = user.usedToLiveCity.map((u) => {
+        if (u.id == itemId) {
+          return { ...u, viewer };
+        } else {
+          return u;
+        }
+      });
+      await PlaceLived.findOneAndUpdate(
+        { userId: id },
+        { usedToLiveCity: updated }
+      );
+    }
+
+    res.success("Filter viewer was changed successfully!");
+  } catch (error) {
+    console.log(error.message);
+    res.fail(error.message);
+  }
+}
