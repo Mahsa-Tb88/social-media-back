@@ -14,7 +14,7 @@ import { checkToken } from "./middlewares/authMiddleWare.js";
 import miscRoutes from "./routes/miscRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 
-import profileRoutes from "./routes/profleRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
 import userRoute from "./routes/userRoute.js";
 import overviewRoutes from "./routes/overviewRoutes.js";
 import workRoutes from "./routes/workRoutes.js";
@@ -24,6 +24,7 @@ import friendRoutes from "./routes/friendRoutes.js";
 import placeRoutes from "./routes/placeRoutes.js";
 import relationshipRoutes from "./routes/relationshipRoutes.js";
 import familyRoutes from "./routes/familyRoutes.js";
+import introRoutes from "./routes/introRoutes.js";
 
 import cookieParser from "cookie-parser";
 
@@ -54,6 +55,7 @@ app.use("/relationships", relationshipRoutes);
 app.use("/families", familyRoutes);
 app.use("/places", placeRoutes);
 app.use("/friends", friendRoutes);
+app.use("/intro", introRoutes);
 
 try {
   await mongoose.connect(process.env.MONGO_URL);

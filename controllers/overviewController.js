@@ -14,6 +14,7 @@ export async function getOverview(req, res) {
 
   try {
     const overview = await Overview.findOne({ userId: req.params.id });
+    console.log("overview", overview);
     res.success("UserInfo was found successfully", overview);
   } catch (error) {
     res.fail(error.message);
