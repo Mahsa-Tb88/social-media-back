@@ -14,7 +14,6 @@ export async function getOverview(req, res) {
 
   try {
     const overview = await Overview.findOne({ userId: req.params.id });
-    console.log("overview", overview);
     res.success("UserInfo was found successfully", overview);
   } catch (error) {
     res.fail(error.message);
@@ -52,6 +51,49 @@ export async function updateOverview(req, res) {
     console.log(error.message);
   }
 }
+export async function editIntro(req, res) {
+  const isValid = mongoose.isValidObjectId(req.params.id);
+  if (!isValid) {
+    res.fail("This User Id is not valid!");
+    return;
+  }
+  if (req.params.id != req.userId) {
+    res.fail("You are not authorized");
+    return;
+  }
+
+  const { Pronounce, School, Location, Hometown, Status } = req.body;
+  try {
+    const overview = await Overview.findOne({ userId: req.params.id });
+
+    if (overview) {
+      await Overview.findOneAndUpdate(
+        { userId: req.params.id },
+        {
+          Pronounce: Pronounce ? Pronounce : overview.Pronounce,
+          School: School ? School : overview.School,
+          Location: Location ? Location : overview.Location,
+          Hometown: Hometown ? Hometown : overview.Hometown,
+          Status: Status ? Status : overview.Status,
+        }
+      );
+    } else {
+      await Overview.create({
+        userId: req.params.id,
+        Pronounce,
+        School,
+        Location,
+        Hometown,
+        Status,
+      });
+    }
+
+    res.success(" was updated successfully");
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
 export async function deleteItemOverview(req, res) {
   if (req.params.id != req.userId) {
     res.fail("You are not authorized");

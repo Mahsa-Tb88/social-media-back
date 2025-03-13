@@ -9,8 +9,8 @@ const overviewSchema = new mongoose.Schema(
     Status: { type: Object },
     Phone: { type: Object },
     Email: { type: Object },
-    Intro: { type: String },
-    Pronounce: { type: String },
+    Intro: { type: Object },
+    Pronounce: { type: Object },
   },
 
   { timestamps: true }
