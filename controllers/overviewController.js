@@ -7,13 +7,16 @@ export async function getOverview(req, res) {
     res.fail("This User Id is not valid!");
     return;
   }
-  if (req.params.id != req.userId) {
-    res.fail("You are not authorized");
-    return;
-  }
+
 
   try {
-    const overview = await Overview.findOne({ userId: req.params.id });
+    let overview;
+    const findOverview = await Overview.findOne({ userId: req.params.id });
+    if (findOverview) {
+      overview = findOverview;
+    } else {
+      overview = {};
+    }
     res.success("UserInfo was found successfully", overview);
   } catch (error) {
     res.fail(error.message);
