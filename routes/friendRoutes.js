@@ -5,6 +5,7 @@ import {
   removeRequestFriend,
   removeFriend
 } from "../controllers/friendController.js";
+import { findUserFriedns } from "../controllers/userController.js";
 const router = express.Router();
 
 router.put("/add/:userId", makeFriend);

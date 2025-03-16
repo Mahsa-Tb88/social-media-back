@@ -2,8 +2,6 @@ import mongoose from "mongoose";
 import User from "../models/userSchema.js";
 import Friend from "../models/friendSchema.js";
 
-
-
 export async function getAllUsers(req, res) {
   try {
     const users = await User.find();
@@ -45,14 +43,17 @@ export async function findUserFriedns(req, res) {
     res.fail("This User Id is not valid!");
     return;
   }
-  if (req.params.id != req.userId) {
-    res.fail("You are not authorized");
-    return;
-  }
 
   try {
     let friends;
     friends = await Friend.findOne({ userId: req.params.id });
+    const findFriend = friends.listFriend.filter(
+      (f) => f.id == req.userId && f.status == "accepted"
+    );
+
+    if (req.params.id != req.userId || !findFriend.length) {
+      res.fail("You are not authorized");
+    }
     if (!friends) {
       friends = [];
     }
@@ -61,9 +62,3 @@ export async function findUserFriedns(req, res) {
     res.fail(error.message);
   }
 }
-
-
-
-
-
-
