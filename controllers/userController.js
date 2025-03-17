@@ -43,16 +43,15 @@ export async function findUserFriedns(req, res) {
     res.fail("This User Id is not valid!");
     return;
   }
-
   try {
     let friends;
     friends = await Friend.findOne({ userId: req.params.id });
     const findFriend = friends.listFriend.filter(
       (f) => f.id == req.userId && f.status == "accepted"
     );
-
-    if (req.params.id != req.userId || !findFriend.length) {
-      res.fail("You are not authorized");
+    if (req.params.id != req.userId && !findFriend.length) {
+      res.fail("You are not authorized", 401);
+      return;
     }
     if (!friends) {
       friends = [];
