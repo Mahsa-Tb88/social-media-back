@@ -64,6 +64,27 @@ export async function createNewPost(req, res) {
     res.fail(error.message);
   }
 }
+export async function editPostById(req, res) {
+  const { title, desc, image, video, feeling, viewer, userId, id } = req.body;
+  if (req.userId !== userId) {
+    res.fail("You are not authorized to edit this post");
+  }
+  try {
+    const post = await Post.findById(id);
+    await Post.findByIdAndUpdate(id, {
+      title: title ? title : post.title,
+      desc: desc ? desc : post.desc,
+      image: image == "noImage" ? "" : image != "noImage" ? image : post.image,
+      video: video ? video : post.video,
+      feeling: feeling ? feeling : post.feeling,
+      viewer: viewer ? viewer : post.viewer,
+    });
+
+    res.success("Post was updated successfully!", 200);
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
 
 export async function editUserById(req, res) {
   const { username, work, livesIn, password, email } = req.body;
