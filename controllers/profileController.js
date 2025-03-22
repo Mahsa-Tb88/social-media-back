@@ -64,6 +64,27 @@ export async function createNewPost(req, res) {
     res.fail(error.message);
   }
 }
+export async function deletePost(req, res) {
+
+  try {
+    const findPost = await Post.findById(req.params.id);
+    if (findPost) {
+      if (req.userId != findPost.userId) {
+        res.fail("You are not authorized to delete this post");
+        return;
+      } else {
+        await Post.findByIdAndDelete(req.params.id);
+        res.success("Post was deleted successfully!", 200);
+        return;
+      }
+    } else {
+      res.fail("This Id is not valid!");
+      return;
+    }
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
 export async function editPostById(req, res) {
   const { title, desc, image, video, feeling, viewer, userId, id } = req.body;
   if (req.userId !== userId) {
