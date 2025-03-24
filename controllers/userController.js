@@ -20,6 +20,7 @@ export async function getUserById(req, res) {
 
   try {
     const user = await User.findById(req.params.id);
+    user.password = undefined;
     res.success(" User was found successfully!", user);
   } catch (error) {
     res.fail(error.message);
