@@ -7,10 +7,11 @@ import {
   updateWork,
   filterViewer,
 } from "../controllers/workController.js";
+import { isAuthorized } from "../middlewares/authMiddleWare.js";
 
 const router = express.Router();
 
-router.get("/:id", getWork);
+router.get("/:id", isAuthorized, getWork);
 router.put("/new/:id", addNewWork);
 router.put("/edit/:id", updateWork);
 router.delete("/delete/:id", deleteWork);

@@ -7,10 +7,6 @@ export async function getWork(req, res) {
     res.fail("This User Id is not valid!");
     return;
   }
-  if (req.params.id != req.userId) {
-    res.fail("You are not authorized");
-    return;
-  }
 
   try {
     const work = await Work.find({ userId: req.params.id });

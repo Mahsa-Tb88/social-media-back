@@ -1,3 +1,4 @@
+import Friend from "../models/friendSchema.js";
 import Post from "../models/postSchema.js";
 import mongoose from "mongoose";
 
@@ -21,8 +22,18 @@ export async function getPostById(req, res) {
     return;
   }
   try {
-    const posts = await Post.findById(req.params.id).populate("userId");
-    res.success("found posts of user successfully!", posts);
+    const post = await Post.findById(req.params.id).populate("userId");
+    const user = await Friend.findOne({ userId: post.userId });
+
+    const isFriend = user.listFriend.filter(
+      (f) => f.id == req.userId && f.status == "accepted"
+    );
+    if (req.userId != post.userId && isFriend.length) {
+      res.fail("Access denied: Not a friend", 400);
+      return;
+    }
+
+    res.success("found posts of user successfully!", post);
   } catch (error) {
     res.fail(error.message, 500);
   }

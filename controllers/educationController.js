@@ -7,10 +7,7 @@ export async function getEducation(req, res) {
     res.fail("This User Id is not valid!");
     return;
   }
-  if (req.params.id != req.userId) {
-    res.fail("You are not authorized");
-    return;
-  }
+  
   try {
     const education = await Education.find({ userId: req.params.id });
     res.success("workEducation was found successfully!", education);

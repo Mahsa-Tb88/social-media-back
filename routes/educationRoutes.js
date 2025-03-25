@@ -6,9 +6,10 @@ import {
   updateEducation,
   filterViewer
 } from "../controllers/educationController.js";
+import { isAuthorized } from "../middlewares/authMiddleWare.js";
 const router = express.Router();
 
-router.get("/:id", getEducation);
+router.get("/:id",isAuthorized, getEducation);
 router.put("/new/:id", addEducation);
 router.put("/edit/:id", updateEducation);
 router.put("/delete/:id", deleteEducation);

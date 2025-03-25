@@ -4,11 +4,12 @@ import {
   deletePlace,
   editPlace,
   getPlaceLived,
-  filterViewer
+  filterViewer,
 } from "../controllers/placeController.js";
+import { isAuthorized } from "../middlewares/authMiddleWare.js";
 const router = express.Router();
 
-router.get("/:id", getPlaceLived);
+router.get("/:id", isAuthorized, getPlaceLived);
 router.put("/new/:id", addPlace);
 router.put("/delete/:id", deletePlace);
 router.put("/edit/:id", editPlace);

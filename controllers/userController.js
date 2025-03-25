@@ -5,7 +5,14 @@ import Friend from "../models/friendSchema.js";
 export async function getAllUsers(req, res) {
   try {
     const users = await User.find();
-    const selectedUsers = users.filter((user) => user._id != req.userId);
+    let selectedUsers = users.filter((user) => user._id != req.userId);
+    selectedUsers = selectedUsers.map((user) => {
+      user.password = undefined;
+      user.emailRegister = undefined;
+      user.bio = undefined;
+      return user;
+    });
+    console.log("selected", selectedUsers);
     res.success("get all users successfully", selectedUsers);
   } catch (error) {
     res.fail(error.message);

@@ -61,18 +61,15 @@ export async function editUserById(req, res) {
   }
 }
 
-export async function getPhotosById(req, res) {
+export async function getGalleryById(req, res) {
   const id = req.params.id;
-
+ 
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {
     res.fail("This User Id is not valid!");
     return;
   }
-  if (id != req.userId) {
-    res.fail("You are not authorized to get photos");
-    return;
-  }
+  
 
   try {
     const posts = await Post.find({ userId: id });

@@ -7,10 +7,7 @@ export async function getContacUserInfo(req, res) {
     res.fail("This User Id is not valid!");
     return;
   }
-  if (req.params.id != req.userId) {
-    res.fail("You are not authorized");
-    return;
-  }
+  
 
   try {
     const contactBaseInfo = await ContactBasicInfo.findOne({
@@ -18,6 +15,7 @@ export async function getContacUserInfo(req, res) {
     });
     res.success("UserInfo was found successfully", contactBaseInfo);
   } catch (error) {
+    console.log("error");
     res.fail(error.message);
   }
 }
