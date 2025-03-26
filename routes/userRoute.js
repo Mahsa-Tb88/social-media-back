@@ -10,7 +10,7 @@ import { isAuthorized } from "../middlewares/authMiddleWare.js";
 const router = express.Router();
 
 router.get("/", getAllUsers);
-router.get("/:id",isAuthorized, getUserById);
+router.get("/:id", getUserById);
 router.get("/search/findUser", findUser);
 router.get("/friends/:id", findUserFriedns);
 

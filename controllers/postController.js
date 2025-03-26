@@ -28,7 +28,7 @@ export async function getPostById(req, res) {
     const isFriend = user.listFriend.filter(
       (f) => f.id == req.userId && f.status == "accepted"
     );
-    if (req.userId != post.userId && isFriend.length) {
+    if (req.userId != post.userId && !isFriend.length) {
       res.fail("Access denied: Not a friend", 400);
       return;
     }

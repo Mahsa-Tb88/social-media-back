@@ -12,7 +12,6 @@ export async function getAllUsers(req, res) {
       user.bio = undefined;
       return user;
     });
-    console.log("selected", selectedUsers);
     res.success("get all users successfully", selectedUsers);
   } catch (error) {
     res.fail(error.message);
@@ -24,12 +23,13 @@ export async function getUserById(req, res) {
     res.fail("This User Id is not valid!");
     return;
   }
-
+  console.log("get user");
   try {
     const user = await User.findById(req.params.id);
     user.password = undefined;
     res.success(" User was found successfully!", user);
   } catch (error) {
+    console.log("error", error);
     res.fail(error.message);
   }
 }

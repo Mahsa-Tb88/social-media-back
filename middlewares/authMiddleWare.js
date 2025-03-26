@@ -22,12 +22,10 @@ export async function checkToken(req, res, next) {
 }
 
 export async function isAuthorized(req, res, next) {
-
   const userId = req.params.id;
   if (req.userId == userId) {
     return next();
   }
-
   try {
     const user = await Friend.findOne({ userId });
     if (!user) {
@@ -37,7 +35,8 @@ export async function isAuthorized(req, res, next) {
     const isFriend = user.listFriend.filter(
       (f) => f.id == req.userId && f.status == "accepted"
     );
-    if (isFriend.length) {
+    console.log("isfriend is...", isFriend);
+    if (!isFriend.length) {
       res.fail("Access denied: Not a friend");
       return;
     }
