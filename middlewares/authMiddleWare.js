@@ -35,7 +35,6 @@ export async function isAuthorized(req, res, next) {
     const isFriend = user.listFriend.filter(
       (f) => f.id == req.userId && f.status == "accepted"
     );
-    console.log("isfriend is...", isFriend);
     if (!isFriend.length) {
       res.fail("Access denied: Not a friend");
       return;

@@ -18,17 +18,18 @@ export async function getPostsUserById(req, res) {
 export async function getPostById(req, res) {
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {
-    res.fail("This User Id is not valid!");
+    res.fail("This Id is not valid!");
     return;
   }
   try {
     const post = await Post.findById(req.params.id).populate("userId");
-    const user = await Friend.findOne({ userId: post.userId });
+
+    const user = await Friend.findOne({ userId: post.userId._id });
 
     const isFriend = user.listFriend.filter(
       (f) => f.id == req.userId && f.status == "accepted"
     );
-    if (req.userId != post.userId && !isFriend.length) {
+    if (req.userId != post.userId._id && !isFriend.length) {
       res.fail("Access denied: Not a friend", 400);
       return;
     }
@@ -81,11 +82,13 @@ export async function deletePost(req, res) {
 }
 export async function editPostById(req, res) {
   const { title, desc, image, video, feeling, viewer, userId, id } = req.body;
-  if (req.userId !== userId) {
+  if (req.userId !== userId._id) {
     res.fail("You are not authorized to edit this post");
   }
+  console.log("req.body", req.body);
   try {
     const post = await Post.findById(id);
+
     await Post.findByIdAndUpdate(id, {
       title: title ? title : post.title,
       desc: desc ? desc : post.desc,
@@ -94,7 +97,6 @@ export async function editPostById(req, res) {
       feeling: feeling ? feeling : post.feeling,
       viewer: viewer ? viewer : post.viewer,
     });
-
     res.success("Post was updated successfully!", 200);
   } catch (error) {
     console.log("erorrr", error);
