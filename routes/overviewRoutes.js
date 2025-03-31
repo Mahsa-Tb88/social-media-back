@@ -11,7 +11,7 @@ const router = express.Router();
 
 import { isAuthorized } from "../middlewares/authMiddleWare.js";
 
-router.get("/:id", isAuthorized, getOverview);
+router.get("/:id", getOverview);
 router.put("/edit/:id", updateOverview);
 router.put("/edit/intro/:id", editIntro);
 router.put("/delete/:id", deleteItemOverview);

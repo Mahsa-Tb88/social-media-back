@@ -8,7 +8,6 @@ export async function getOverview(req, res) {
     return;
   }
 
-
   try {
     let overview;
     const findOverview = await Overview.findOne({ userId: req.params.id });
