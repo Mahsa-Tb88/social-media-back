@@ -9,7 +9,7 @@ import {
 import { isAuthorized } from "../middlewares/authMiddleWare.js";
 const router = express.Router();
 
-router.get("/:id", isAuthorized, getPlaceLived);
+router.get("/:id", getPlaceLived);
 router.put("/new/:id", addPlace);
 router.put("/delete/:id", deletePlace);
 router.put("/edit/:id", editPlace);

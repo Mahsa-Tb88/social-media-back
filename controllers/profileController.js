@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import User from "../models/userSchema.js";
 import bcrypt from "bcrypt";
 import Post from "../models/postSchema.js";
+import Friend from "../models/friendSchema.js";
 
 export async function updateBackground(req, res) {
   const { image, id } = req.body;
@@ -61,32 +62,52 @@ export async function editUserById(req, res) {
   }
 }
 
-export async function getGalleryById(req, res) {
+export async function getGalleryByUserId(req, res) {
   const id = req.params.id;
- 
-  const isValid = mongoose.isValidObjectId(req.params.id);
-  if (!isValid) {
-    res.fail("This User Id is not valid!");
-    return;
-  }
-  
-
   try {
+    const user = await User.findById(id);
+    if (!user) {
+      res.fail("This id is not valid!", 400);
+      return;
+    }
+    const friendsUser = await Friend.findOne({ userId: id });
+    const findFriend = friendsUser.listFriend.filter(
+      (f) => f.id == req.userId && f.status == "accepted"
+    );
     const posts = await Post.find({ userId: id });
-    const photos = [];
-    posts.forEach((p) => {
-      if (p.image) {
-        photos.push({ image: p.image, id: p._id.toString() });
+    if (!posts) {
+      res.success("No photos or videos yet!", { photos: [], videos: [] });
+    }
+
+    let photos = [];
+    let videos = [];
+
+    posts.forEach((post) => {
+      if (post.viewer == "public") {
+        if (post.image) {
+          photos.push({ image: post.image, id: post._id.toString() });
+        }
+        if (post.video) {
+          videos.push({ video: post.video, id: post._id.toString() });
+        }
+      } else if (post.viewer == "private" && req.userId == id) {
+        if (post.image) {
+          photos.push({ image: post.image, id: post._id.toString() });
+        }
+        if (post.video) {
+          videos.push({ video: post.video, id: post._id.toString() });
+        }
+      } else if (post.viewer == "friends" && findFriend.length) {
+        if (post.image) {
+          photos.push({ image: post.image, id: post._id.toString() });
+        }
+        if (post.video) {
+          videos.push({ video: post.video, id: post._id.toString() });
+        }
       }
     });
 
-    const videos = [];
-    posts.forEach((v) => {
-      if (v.video) {
-        videos.push({ video: v.video, id: p._id.toString() });
-      }
-    });
-    res.success("user info updated Successfully!", { photos, videos });
+    res.success("gallery was found successfully!", { photos, videos });
   } catch (error) {
     res.fail(error.message);
   }

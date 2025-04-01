@@ -46,27 +46,36 @@ export async function findUser(req, res) {
   }
 }
 export async function findUserFriedns(req, res) {
-  const isValid = mongoose.isValidObjectId(req.params.id);
-  if (!isValid) {
-    res.fail("This User Id is not valid!");
-    return;
-  }
-
   try {
     let friends;
-    friends = await Friend.findOne({ userId: req.params.id });
+    const findUser = await User.findById(req.params.id);
+    if (!findUser) {
+      res.fail("This user Id is not valis!", 400);
+      return;
+    }
 
+    // check is friend
+    friends = await Friend.findOne({ userId: req.params.id });
     const findFriend = friends.listFriend.filter(
       (f) => f.id == req.userId && f.status == "accepted"
     );
 
-    if (
-      friends.viewer == "private" ||
-      (friends.viewer == "friends" && !findFriend.length) ||
-      !friends
-    ) {
-      friends = [];
+    if (friends.viewer == "private") {
+      friends = { message: "This Section is private", listFriend: [] };
+    } else if (friends.viewer == "friends" && !findFriend.length) {
+      friends = {
+        message: "You don’t have permission to view this section!",
+        listFriend: [],
+      };
+    } else if (!friends) {
+      friends = { message: "There is no friend yet!", listFriend: [] };
+    } else {
+      friends = {
+        message: "list friends",
+        listFriend: friends.listFriend,
+      };
     }
+
     res.success("Friends were found successfully!", friends);
   } catch (error) {
     res.fail(error.message);

@@ -1,22 +1,49 @@
 import mongoose from "mongoose";
 import Overview from "../models/overviewSchema.js";
+import User from "../models/userSchema.js";
+import Friend from "../models/friendSchema.js";
 
 export async function getOverview(req, res) {
-  const isValid = mongoose.isValidObjectId(req.params.id);
-  if (!isValid) {
-    res.fail("This User Id is not valid!");
-    return;
-  }
-
   try {
-    let overview;
-    const findOverview = await Overview.findOne({ userId: req.params.id });
-    if (findOverview) {
-      overview = findOverview;
-    } else {
-      overview = {};
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      res.fail("This userId is not valid!");
+      return;
     }
-    res.success("UserInfo was found successfully", overview);
+
+    const userFriend = await Friend.findOne({ userId: req.params.id });
+    let isFriend = userFriend.listFriend.find(
+      (friend) => friend.id == req.userId && friend.status == "accepted"
+    );
+    isFriend = isFriend ? true : false;
+    const isOwner = req.userId == req.params.id ? true : false;
+
+    const findOverview = await Overview.findOne({
+      userId: req.params.id,
+    });
+    let overview = {};
+    if (findOverview) {
+      const data = findOverview.toObject();
+      Object.keys(data).forEach((item) => {
+        if (
+          data[item].viewer == "public" ||
+          (data[item].viewer == "friends" && isFriend)
+        ) {
+          overview[item] = data[item];
+        }
+
+        if (isOwner) {
+          overview[item] = data[item];
+        }
+      });
+    } else {
+    }
+
+    res.success("UserInfo was found successfully", [
+      overview,
+      isFriend,
+      isOwner,
+    ]);
   } catch (error) {
     res.fail(error.message);
   }

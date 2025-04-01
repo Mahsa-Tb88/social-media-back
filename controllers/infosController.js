@@ -1,21 +1,51 @@
 import mongoose from "mongoose";
 import ContactBasicInfo from "../models/contactBaseInfoSchema.js";
+import User from "../models/userSchema.js";
+import Friend from "../models/friendSchema.js";
 
 export async function getContacUserInfo(req, res) {
-  const isValid = mongoose.isValidObjectId(req.params.id);
-  if (!isValid) {
-    res.fail("This User Id is not valid!");
-    return;
-  }
-  
+  const id = req.params.id;
 
   try {
-    const contactBaseInfo = await ContactBasicInfo.findOne({
-      userId: req.params.id,
+    const user = await User.findById(id);
+    if (!user) {
+      res.fail("This user id is not valid!");
+      return;
+    }
+
+    let fidnFriend = await Friend.findOne({ userId: id });
+    fidnFriend = fidnFriend.listFriend.find(
+      (f) => f.id == req.userId && f.status == "accepted"
+    );
+    const isFriend = fidnFriend ? true : false;
+    const isOwner = req.userId == id ? true : false;
+
+    const findContactBaseInfo = await ContactBasicInfo.findOne({
+      userId: id,
     });
-    res.success("UserInfo was found successfully", contactBaseInfo);
+    let contactBaseInfo = {};
+    if (findContactBaseInfo) {
+      const data = findContactBaseInfo.toObject();
+      Object.keys(data).forEach((item) => {
+        if (
+          data[item].viewer == "public" ||
+          (data[item].viewer == "friends" && isFriend)
+        ) {
+          contactBaseInfo[item] = data[item];
+        }
+
+        if (isOwner) {
+          contactBaseInfo[item] = data[item];
+        }
+      });
+    }
+    res.success("UserInfo was found successfully", [
+      contactBaseInfo,
+      isFriend,
+      isOwner,
+    ]);
   } catch (error) {
-    console.log("error");
+    console.log("error", error);
     res.fail(error.message);
   }
 }
