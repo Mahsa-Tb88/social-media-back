@@ -1,16 +1,41 @@
 import mongoose from "mongoose";
 import Education from "../models/educationSchema.js";
+import User from "../models/userSchema.js";
+import Friend from "../models/friendSchema.js";
 
 export async function getEducation(req, res) {
-  const isValid = mongoose.isValidObjectId(req.params.id);
-  if (!isValid) {
-    res.fail("This User Id is not valid!");
-    return;
-  }
-  
   try {
-    const education = await Education.find({ userId: req.params.id });
-    res.success("workEducation was found successfully!", education);
+    const id = req.params.id;
+    const user = await User.findById(id);
+    if (!user) {
+      res.fail("This id is not valid");
+      return;
+    }
+
+    const findUserFriend = await Friend.findOne({ userId: id });
+    const friend = findUserFriend.listFriend.find(
+      (f) => f.id == req.userId && f.status == "accepted"
+    );
+    const isFriend = friend ? true : false;
+    const isOwner = req.userId == id ? true : false;
+
+    const finEducation = await Education.find({ userId: id });
+
+    let education = [];
+    finEducation.forEach((w) => {
+      if (w.viewer == "public" || (w.viewer == "friends" && isFriend)) {
+        education.push(w);
+      }
+    });
+    if (isOwner) {
+      education = finEducation;
+    }
+
+    res.success("education was found successfully!", [
+      education,
+      isFriend,
+      isOwner,
+    ]);
   } catch (error) {
     res.fail(error.message);
   }

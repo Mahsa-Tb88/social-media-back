@@ -1,23 +1,46 @@
 import mongoose from "mongoose";
 import Work from "../models/workSchema.js";
+import User from "../models/userSchema.js";
+import Friend from "../models/friendSchema.js";
 
 export async function getWork(req, res) {
-  const isValid = mongoose.isValidObjectId(req.params.id);
-  if (!isValid) {
-    res.fail("This User Id is not valid!");
-    return;
-  }
-
+  const id = req.params.id;
   try {
-    const work = await Work.find({ userId: req.params.id });
+    const user = await User.findById(id);
+    if (!user) {
+      res.fail("This user id is not valid!");
+      return;
+    }
 
-    res.success("workEducation was found successfully!", work);
+    const findUserFriend = await Friend.findOne({ userId: id });
+    const friend = findUserFriend.listFriend.find(
+      (f) => f.id == req.userId && f.status == "accepted"
+    );
+    const isFriend = friend ? true : false;
+    const isOwner = req.userId == id ? true : false;
+
+    const findWork = await Work.find({ userId: req.params.id });
+    let work = [];
+    findWork.forEach((w) => {
+      if (w.viewer == "public" || (w.viewer == "friends" && isFriend)) {
+        work.push(w);
+      }
+    });
+    if (isOwner) {
+      work = findWork;
+    }
+
+
+    res.success("workEducation was found successfully!", [
+      work,
+      isFriend,
+      isOwner,
+    ]);
   } catch (error) {
-    console.log("error");
+    console.log("error", error);
     res.fail(error.message);
   }
 }
-
 export async function addNewWork(req, res) {
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {

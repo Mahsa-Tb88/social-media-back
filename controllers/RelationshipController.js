@@ -1,18 +1,43 @@
 import mongoose from "mongoose";
 import FamilyRel from "../models/familyRelationship.js";
+import User from "../models/userSchema.js";
+import Friend from "../models/friendSchema.js";
 
 export async function getFamilyRel(req, res) {
-  const isValid = mongoose.isValidObjectId(req.params.id);
-  if (!isValid) {
-    res.fail("This User Id is not valid!");
-    return;
-  }
-
+  const id = req.params.id;
+  console.log("iddd", id);
   try {
-    const familyRel = await FamilyRel.findOne({ userId: req.params.id });
+    const user = await User.findById(id);
+    if (!user) {
+      res.fail("This id is not valid!");
+      return;
+    }
 
-    res.success("it was found successfully!", familyRel);
+    const findUserFriend = await Friend.findOne({ userId: id });
+    const friend = findUserFriend.listFriend.find(
+      (f) => f.id == req.userId && f.status == "accepted"
+    );
+    const isFriend = friend ? true : false;
+    const isOwner = req.userId == id ? true : false;
+    const findFamilyRel = await FamilyRel.findOne({ userId: req.params.id });
+
+    let familyRel = [];
+    findFamilyRel.forEach((w) => {
+      if (w.viewer == "public" || (w.viewer == "friends" && isFriend)) {
+        familyRel.push(w);
+      }
+    });
+    if (isOwner) {
+      familyRel = findFamilyRel;
+    }
+    console.log("family", familyRel);
+    res.success("workEducation was found successfully!", [
+      familyRel,
+      isFriend,
+      isOwner,
+    ]);
   } catch (error) {
+    console.log("error", error);
     res.fail(error.message);
   }
 }
