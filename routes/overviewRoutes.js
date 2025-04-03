@@ -9,7 +9,6 @@ import {
 
 const router = express.Router();
 
-import { isAuthorized } from "../middlewares/authMiddleWare.js";
 
 router.get("/:id", getOverview);
 router.put("/edit/:id", updateOverview);

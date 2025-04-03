@@ -1,17 +1,62 @@
 import mongoose from "mongoose";
 import PlaceLived from "../models/placeLived.js";
+import User from "../models/userSchema.js";
+import Friend from "../models/friendSchema.js";
 
 export async function getPlaceLived(req, res) {
-  const userId = req.params.id;
-  const isValid = mongoose.isValidObjectId(req.params.id);
+  const id = req.params.id;
 
-  if (!isValid) {
-    res.fail("This User Id is not valid!");
-    return;
-  }
   try {
-    const places = await PlaceLived.findOne({ userId });
-    res.success("Place was found successfully!", places);
+    const user = await User.findById(id);
+    if (!user) {
+      res.fail("This user id is not valid!");
+      return;
+    }
+
+    const findUserFriend = await Friend.findOne({ userId: id });
+    const friend = findUserFriend.listFriend.find(
+      (f) => f.id == req.userId && f.status == "accepted"
+    );
+    const isFriend = friend ? true : false;
+    const isOwner = req.userId == id ? true : false;
+    let usedToLiveCity = [];
+    let hometown = {};
+    let currentCity = {};
+
+    const findPlaces = await PlaceLived.findOne({ userId: id });
+
+    if (findPlaces) {
+      findPlaces?.usedToLiveCity.forEach((w) => {
+        if (w.viewer == "public" || (w.viewer == "friends" && isFriend)) {
+          usedToLiveCity.push(w);
+        }
+      });
+
+      if (
+        findPlaces?.hometown.viewer == "public" ||
+        (findPlaces?.hometown.viewer == "friends" && isFriend)
+      ) {
+        hometown = findPlaces.hometown;
+      }
+
+      if (
+        findPlaces?.currentCity.viewer == "public" ||
+        (findPlaces?.currentCity.viewer == "friends" && isFriend)
+      ) {
+        currentCity = findPlaces.currentCity;
+      }
+
+      if (isOwner) {
+        usedToLiveCity = findPlaces?.usedToLiveCity;
+        currentCity = findPlaces?.currentCity;
+        hometown = findPlaces?.hometown;
+      }
+    }
+    res.success("Place was found successfully!", {
+      places: [usedToLiveCity, currentCity, hometown],
+      isFriend,
+      isOwner,
+    });
   } catch (error) {
     res.fail(error.message);
   }

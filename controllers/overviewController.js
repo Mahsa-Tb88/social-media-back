@@ -10,7 +10,6 @@ export async function getOverview(req, res) {
       res.fail("This userId is not valid!");
       return;
     }
-
     const userFriend = await Friend.findOne({ userId: req.params.id });
     let isFriend = userFriend.listFriend.find(
       (friend) => friend.id == req.userId && friend.status == "accepted"
@@ -22,33 +21,33 @@ export async function getOverview(req, res) {
       userId: req.params.id,
     });
     let overview = {};
-    if (findOverview) {
-      const data = findOverview.toObject();
-      Object.keys(data).forEach((item) => {
-        if (
-          data[item].viewer == "public" ||
-          (data[item].viewer == "friends" && isFriend)
-        ) {
-          overview[item] = data[item];
-        }
+    const data = findOverview.toObject();
+    Object.keys(data).forEach((item) => {
+      if (
+        data[item].viewer == "public" ||
+        (data[item].viewer == "friends" && isFriend)
+      ) {
+        overview[item] = data[item];
+      }
 
-        if (isOwner) {
-          overview[item] = data[item];
-        }
-      });
-    } else {
-    }
+      if (isOwner) {
+        overview[item] = data[item];
+      }
+    });
 
-    res.success("UserInfo was found successfully", [
+    res.success("UserInfo was found successfully", {
       overview,
       isFriend,
       isOwner,
-    ]);
+    });
   } catch (error) {
     res.fail(error.message);
   }
 }
+
 export async function updateOverview(req, res) {
+  console.log("req.body...", req.body);
+
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {
     res.fail("This User Id is not valid!");
@@ -80,6 +79,7 @@ export async function updateOverview(req, res) {
     console.log(error.message);
   }
 }
+
 export async function editIntro(req, res) {
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {
@@ -90,7 +90,6 @@ export async function editIntro(req, res) {
     res.fail("You are not authorized");
     return;
   }
-
   const { Pronounce, School, Location, Hometown, Status } = req.body;
   try {
     const overview = await Overview.findOne({ userId: req.params.id });

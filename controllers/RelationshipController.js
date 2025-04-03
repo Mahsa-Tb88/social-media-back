@@ -5,7 +5,6 @@ import Friend from "../models/friendSchema.js";
 
 export async function getFamilyRel(req, res) {
   const id = req.params.id;
-  console.log("iddd", id);
   try {
     const user = await User.findById(id);
     if (!user) {
@@ -21,18 +20,30 @@ export async function getFamilyRel(req, res) {
     const isOwner = req.userId == id ? true : false;
     const findFamilyRel = await FamilyRel.findOne({ userId: req.params.id });
 
-    let familyRel = [];
-    findFamilyRel.forEach((w) => {
-      if (w.viewer == "public" || (w.viewer == "friends" && isFriend)) {
-        familyRel.push(w);
+    let relationship = {};
+    let family = [];
+    if (findFamilyRel) {
+      findFamilyRel?.family.forEach((w) => {
+        if (w.viewer == "public" || (w.viewer == "friends" && isFriend)) {
+          family.push(w);
+        }
+      });
+
+      if (
+        findFamilyRel?.relationship.viewer == "public" ||
+        (findFamilyRel?.relationship.viewer == "friends" && isFriend)
+      ) {
+        relationship = findFamilyRel.relationship;
       }
-    });
-    if (isOwner) {
-      familyRel = findFamilyRel;
+
+      if (isOwner) {
+        family = findFamilyRel?.family || [];
+        relationship = findFamilyRel?.relationship || {};
+      }
     }
-    console.log("family", familyRel);
+
     res.success("workEducation was found successfully!", [
-      familyRel,
+      { relationship, family },
       isFriend,
       isOwner,
     ]);

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import User from "../models/userSchema.js";
 import Friend from "../models/friendSchema.js";
+import Overview from "../models/overviewSchema.js";
 
 export async function getAllUsers(req, res) {
   try {
@@ -77,6 +78,45 @@ export async function findUserFriedns(req, res) {
     }
 
     res.success("Friends were found successfully!", friends);
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
+export async function getUserIntro(req, res) {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      res.fail("This userId is not valid!");
+      return;
+    }
+    const userFriend = await Friend.findOne({ userId: req.params.id });
+    let isFriend = userFriend.listFriend.find(
+      (friend) => friend.id == req.userId && friend.status == "accepted"
+    );
+    isFriend = isFriend ? true : false;
+    const isOwner = req.userId == req.params.id ? true : false;
+
+    const findOverview = await Overview.findOne({
+      userId: req.params.id,
+    });
+    console.log("oover", findOverview);
+    let overview = {};
+    if (findOverview) {
+      if (user.viewerProfile == "friends" && isFriend) {
+        overview = findOverview;
+      }
+      if (isOwner || user.viewerProfile == "public") {
+        overview = findOverview;
+      }
+    }
+    console.log("0000", overview);
+
+    res.success("UserInfo was found successfully", {
+      overview,
+      isFriend,
+      isOwner,
+    });
   } catch (error) {
     res.fail(error.message);
   }

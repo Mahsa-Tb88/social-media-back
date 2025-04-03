@@ -13,6 +13,7 @@ export async function getWork(req, res) {
     }
 
     const findUserFriend = await Friend.findOne({ userId: id });
+    
     const friend = findUserFriend.listFriend.find(
       (f) => f.id == req.userId && f.status == "accepted"
     );
