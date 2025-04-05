@@ -8,7 +8,7 @@ export async function loginUser(req, res) {
   if (!username && !password) {
     return res.fail("Please enter username and password!", 400);
   }
-
+  console.log("usernameee", req.body);
   try {
     const user = await User.findOne({ username: username.toLowerCase() });
     if (!user) {
@@ -51,7 +51,7 @@ export async function loginUser(req, res) {
 }
 
 export async function registerUser(req, res) {
-  const { username, email, password, work, livesIn } = req.body;
+  const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
     return res.fail("Please Enter a value for all field!");
@@ -72,7 +72,6 @@ export async function registerUser(req, res) {
       emailRegister: email.toLowerCase(),
       password: hashPassword,
     });
-    // await Overview.create({ userId: newUser._id.toString() });
 
     newUser.password = undefined;
     res.success("New User created successfully!", newUser);

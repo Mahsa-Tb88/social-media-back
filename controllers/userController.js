@@ -100,7 +100,6 @@ export async function getUserIntro(req, res) {
     const findOverview = await Overview.findOne({
       userId: req.params.id,
     });
-    console.log("oover", findOverview);
     let overview = {};
     if (findOverview) {
       if (user.viewerProfile == "friends" && isFriend) {
@@ -110,7 +109,6 @@ export async function getUserIntro(req, res) {
         overview = findOverview;
       }
     }
-    console.log("0000", overview);
 
     res.success("UserInfo was found successfully", {
       overview,

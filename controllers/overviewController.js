@@ -46,7 +46,6 @@ export async function getOverview(req, res) {
 }
 
 export async function updateOverview(req, res) {
-  console.log("req.body...", req.body);
 
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {

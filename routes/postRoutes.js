@@ -10,7 +10,7 @@ import { isAuthorized } from "../middlewares/authMiddleWare.js";
 
 const router = express.Router();
 
-router.get("/:id", isAuthorized, getPostsUserById);
+router.get("/:id", getPostsUserById);
 router.get("/single/:id", getPostById);
 router.post("/new", createNewPost);
 router.delete("/:id", deletePost);

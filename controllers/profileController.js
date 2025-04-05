@@ -31,7 +31,7 @@ export async function updateProfileImg(req, res) {
 }
 
 export async function editUserById(req, res) {
-  const { username, work, livesIn, password, email } = req.body;
+  const { username, password, viewerProfile } = req.body;
   const id = req.params.id;
 
   const isValid = mongoose.isValidObjectId(req.params.id);
@@ -39,6 +39,7 @@ export async function editUserById(req, res) {
     res.fail("This User Id is not valid!");
     return;
   }
+  console.log("lkkk", req.body);
   console.log(id, req.userId);
   if (id != req.userId) {
     res.fail("You are not athorize to edit");
@@ -48,15 +49,17 @@ export async function editUserById(req, res) {
   const hashPassword = await bcrypt.hash(password, 10);
 
   try {
-    const user = await User.findByIdAndUpdate(id, {
-      username,
-      work,
-      livesIn,
-      password: hashPassword,
-      email,
+    const user = await User.findById(id);
+    const userrr = await User.findByIdAndUpdate(id, {
+      username: username ? username.toLowerCase() : user.username,
+      viewerProfile: viewerProfile ? viewerProfile : user.viewerProfile,
+      password: password ? hashPassword : user.password,
     });
+    console.log("userrr", userrr);
 
-    res.success("user info updated Successfully!");
+    res.success(
+      "Updated successfully! You will be redirected to the login page in 5 seconds!"
+    );
   } catch (error) {
     res.fail(error.message);
   }

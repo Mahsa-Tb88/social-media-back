@@ -3,13 +3,32 @@ import Post from "../models/postSchema.js";
 import mongoose from "mongoose";
 
 export async function getPostsUserById(req, res) {
-  const isValid = mongoose.isValidObjectId(req.params.id);
+  const id = req.params.id;
+  const isValid = mongoose.isValidObjectId(id);
   if (!isValid) {
     res.fail("This User Id is not valid!");
     return;
   }
   try {
-    const posts = await Post.find({ userId: req.params.id });
+    const userFriends = await Friend.findOne({ userId: id });
+
+    const findFriend = userFriends.listFriend.find(
+      (f) => f.id == req.userId && f.status == "accepted"
+    );
+    const isFriend = findFriend ? true : false;
+    const isOwner = req.userId == id ? true : false;
+
+    const findPosts = await Post.find({ userId: req.params.id });
+    let posts = [];
+    findPosts.forEach((p) => {
+      if (p.viewer == "public" || (p.viewer == "friends" && isFriend)) {
+        posts.push(p);
+      }
+    });
+    if (isOwner) {
+      posts = findPosts;
+    }
+
     res.success("found posts of user successfully!", posts);
   } catch (error) {
     res.fail(error.message, 500);
@@ -82,7 +101,7 @@ export async function deletePost(req, res) {
 }
 export async function editPostById(req, res) {
   const { title, desc, image, video, feeling, viewer, userId, id } = req.body;
-  if (req.userId !== userId._id) {
+  if (req.userId !== userId) {
     res.fail("You are not authorized to edit this post");
   }
   console.log("req.body", req.body);
