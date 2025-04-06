@@ -100,7 +100,19 @@ export async function deletePost(req, res) {
   }
 }
 export async function editPostById(req, res) {
-  const { title, desc, image, video, feeling, viewer, userId, id } = req.body;
+  const {
+    title,
+    desc,
+    image,
+    video,
+    feeling,
+    viewer,
+    userId,
+    id,
+    comment,
+    singleLike,
+  } = req.body;
+
   if (req.userId !== userId) {
     res.fail("You are not authorized to edit this post");
   }
@@ -115,6 +127,53 @@ export async function editPostById(req, res) {
       video: video ? video : post.video,
       feeling: feeling ? feeling : post.feeling,
       viewer: viewer ? viewer : post.viewer,
+      comments: comment ? post.comments.push(comment) : post.comments,
+      like: singleLike ? post.like.push(singleLike) : post.like,
+    });
+    res.success("Post was updated successfully!", 200);
+  } catch (error) {
+    console.log("erorrr", error);
+    res.fail(error.message);
+  }
+}
+export async function commentOnPost(req, res) {
+  const id = req.params.id;
+  const { userId, username, profileImg, comment, singleLike } = req.body;
+
+  try {
+    const post = await Post.findById(id);
+    const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+    const isFriend = findFriend.listFriend.find(
+      (f) => f.id == userId && f.status == "accepted"
+    );
+
+    const isOwner = post.userId.toString() == userId ? true : false;
+    if (!isOwner) {
+      if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
+        res.fail("You are not authorized to leave a comment!");
+        return;
+      }
+    }
+    // if (
+    //   (post.viewer == "friends" && !isFriend && !isOwner) ||
+    //   (post.viewer == "private" && !isOwner)
+    // ) {
+    //   res.fail("You are not authorized to leave a comment!");
+    //   return;
+    // }
+
+    const date = Date.now();
+    let userComment;
+    if (comment) {
+      userComment = { comment, username, userId, profileImg, date };
+    }
+    console.log("commets", userComment);
+    const updatedComments = [...post.comments, userComment];
+    console.log("yeee", updatedComments);
+
+    await Post.findByIdAndUpdate(id, {
+      comments: comment ? updatedComments : post.comments,
+      like: singleLike ? post.like.push(singleLike) : post.like,
     });
     res.success("Post was updated successfully!", 200);
   } catch (error) {
