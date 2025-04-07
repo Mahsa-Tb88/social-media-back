@@ -6,6 +6,7 @@ import {
   getPostsUserById,
   getPostById,
   commentOnPost,
+  deleteComment,
 } from "../controllers/postController.js";
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.post("/new", createNewPost);
 router.delete("/:id", deletePost);
 router.put("/edit/:id", editPostById);
 router.put("/comment/:id", commentOnPost);
+router.put("/comment/delete/:id", deleteComment);
 
 export default router;

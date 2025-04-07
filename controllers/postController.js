@@ -100,23 +100,11 @@ export async function deletePost(req, res) {
   }
 }
 export async function editPostById(req, res) {
-  const {
-    title,
-    desc,
-    image,
-    video,
-    feeling,
-    viewer,
-    userId,
-    id,
-    comment,
-    singleLike,
-  } = req.body;
+  const { title, desc, image, video, feeling, viewer, userId, id } = req.body;
 
   if (req.userId !== userId) {
     res.fail("You are not authorized to edit this post");
   }
-  console.log("req.body", req.body);
   try {
     const post = await Post.findById(id);
 
@@ -127,8 +115,6 @@ export async function editPostById(req, res) {
       video: video ? video : post.video,
       feeling: feeling ? feeling : post.feeling,
       viewer: viewer ? viewer : post.viewer,
-      comments: comment ? post.comments.push(comment) : post.comments,
-      like: singleLike ? post.like.push(singleLike) : post.like,
     });
     res.success("Post was updated successfully!", 200);
   } catch (error) {
@@ -138,7 +124,7 @@ export async function editPostById(req, res) {
 }
 export async function commentOnPost(req, res) {
   const id = req.params.id;
-  const { userId, username, profileImg, comment, singleLike } = req.body;
+  const { userId, username, profileImg, comment, dateComment } = req.body;
 
   try {
     const post = await Post.findById(id);
@@ -162,10 +148,15 @@ export async function commentOnPost(req, res) {
     //   return;
     // }
 
-    const date = Date.now();
     let userComment;
     if (comment) {
-      userComment = { comment, username, userId, profileImg, date };
+      userComment = {
+        comment,
+        username,
+        userId,
+        profileImg,
+        date: dateComment,
+      };
     }
     console.log("commets", userComment);
     const updatedComments = [...post.comments, userComment];
@@ -173,9 +164,37 @@ export async function commentOnPost(req, res) {
 
     await Post.findByIdAndUpdate(id, {
       comments: comment ? updatedComments : post.comments,
-      like: singleLike ? post.like.push(singleLike) : post.like,
     });
     res.success("Post was updated successfully!", 200);
+  } catch (error) {
+    console.log("erorrr", error);
+    res.fail(error.message);
+  }
+}
+export async function deleteComment(req, res) {
+  const id = req.params.id;
+  const { comments } = req.body;
+
+  try {
+    const post = await Post.findById(id);
+
+    const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+    const isFriend = findFriend.listFriend.find(
+      (f) => f.id == req.userId && f.status == "accepted"
+    );
+
+    const isOwner = post.userId.toString() == req.userId ? true : false;
+    if (!isOwner) {
+      if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
+        res.fail("You are not authorized to leave a comment!");
+        return;
+      }
+    }
+
+    await Post.findByIdAndUpdate(id, {
+      comments: comments ? comments : post.comments,
+    });
+    res.success("commnet was delete successfully!", 200);
   } catch (error) {
     console.log("erorrr", error);
     res.fail(error.message);
