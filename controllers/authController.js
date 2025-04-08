@@ -8,7 +8,6 @@ export async function loginUser(req, res) {
   if (!username && !password) {
     return res.fail("Please enter username and password!", 400);
   }
-  console.log("usernameee", req.body);
   try {
     const user = await User.findOne({ username: username.toLowerCase() });
     if (!user) {
@@ -43,8 +42,8 @@ export async function loginUser(req, res) {
       viewer: findFriends?.viewer,
       userId: findFriends?.userId,
     };
-
-    res.success("Login Successfully", { user, friends });
+    messages = [];
+    res.success("Login Successfully", { user, friends, messaged });
   } catch (error) {
     res.fail(error.message);
   }

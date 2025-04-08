@@ -9,7 +9,7 @@ const postSchema = new mongoose.Schema(
     desc: { type: String, default: "" },
     feeling: { type: String, default: "" },
     viewer: { type: String, default: "friends" },
-    like: { type: Number, default: 0 },
+    like: { type: [Object], default: [] },
     comments: { type: [Object], default: [] },
   },
   { timestamps: true }

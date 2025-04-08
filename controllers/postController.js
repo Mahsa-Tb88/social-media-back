@@ -25,15 +25,16 @@ export async function getPostsUserById(req, res) {
         posts.push(p);
       }
     });
+
     if (isOwner) {
       posts = findPosts;
     }
-
     res.success("found posts of user successfully!", posts);
   } catch (error) {
     res.fail(error.message, 500);
   }
 }
+
 export async function getPostById(req, res) {
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {
@@ -58,6 +59,7 @@ export async function getPostById(req, res) {
     res.fail(error.message, 500);
   }
 }
+
 export async function createNewPost(req, res) {
   const { title, desc, image, video, feeling, viewer, id } = req.body;
   if (req.userId !== id) {
@@ -158,9 +160,7 @@ export async function commentOnPost(req, res) {
         date: dateComment,
       };
     }
-    console.log("commets", userComment);
     const updatedComments = [...post.comments, userComment];
-    console.log("yeee", updatedComments);
 
     await Post.findByIdAndUpdate(id, {
       comments: comment ? updatedComments : post.comments,
@@ -168,6 +168,46 @@ export async function commentOnPost(req, res) {
     res.success("Post was updated successfully!", 200);
   } catch (error) {
     console.log("erorrr", error);
+    res.fail(error.message);
+  }
+}
+export async function likeOnPost(req, res) {
+  const id = req.params.id;
+  const { userId, username, profileImg, isLike } = req.body;
+
+  try {
+    const post = await Post.findById(id);
+    const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+    const isFriend = findFriend.listFriend.find(
+      (f) => f.id == userId && f.status == "accepted"
+    );
+
+    const isOwner = post.userId.toString() == userId ? true : false;
+    if (!isOwner) {
+      if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
+        res.fail("You are not authorized to like!");
+        return;
+      }
+    }
+    let updatedLike = [];
+    if (isLike) {
+      let newLike = {
+        username,
+        userId,
+        profileImg,
+      };
+
+      updatedLike = [...post.like, newLike];
+    } else {
+      updatedLike = post.like.filter((l) => l.userId != userId);
+    }
+    await Post.findByIdAndUpdate(id, {
+      like: updatedLike,
+    });
+    res.success("like was updated successfully!", 200);
+  } catch (error) {
+    console.log("erorrr", error);
+
     res.fail(error.message);
   }
 }
