@@ -25,6 +25,7 @@ import placeRoutes from "./routes/placeRoutes.js";
 import relationshipRoutes from "./routes/relationshipRoutes.js";
 import familyRoutes from "./routes/familyRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
 
 import cookieParser from "cookie-parser";
 
@@ -56,6 +57,7 @@ app.use("/families", familyRoutes);
 app.use("/places", placeRoutes);
 app.use("/friends", friendRoutes);
 app.use("/posts", postRoutes);
+app.use("/chats", chatRoutes);
 
 try {
   await mongoose.connect(process.env.MONGO_URL);
