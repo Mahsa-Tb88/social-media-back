@@ -48,13 +48,13 @@ export async function loginUser(req, res) {
     const findMsgs = await Chat.find({
       chatId: { $regex: user._id.toString() },
     }).populate("userId");
-    console.log("findMsgs//", findMsgs);
+    // console.log("findMsgs//", findMsgs);
 
     const filterMsgs = findMsgs.filter(
       (msg) => msg.isRead == false && msg.userId != user._id.toString()
     );
 
-    let messages = [];
+    let findAllMessages = [];
     filterMsgs.forEach((msg) => {
       let myMsg = {
         chatId: msg.chatId,
@@ -62,11 +62,21 @@ export async function loginUser(req, res) {
         profileImg: msg.userId.profileImg,
         id: msg._id,
       };
-      messages.push(myMsg);
+      findAllMessages.push(myMsg);
     });
+    console.log("...", findAllMessages);
+    let messages = [];
+    const seenUsernames = new Set();
 
+    findAllMessages.forEach((m) => {
+      if (!seenUsernames.has(m.username)) {
+        messages.push(m);
+        seenUsernames.add(m.username);
+      }
+    });
     console.log("messages//", messages);
-    res.success("Login Successfully", { user, friends, messagesy });
+
+    res.success("Login Successfully", { user, friends, messages });
   } catch (error) {
     res.fail(error.message);
   }

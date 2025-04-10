@@ -2,7 +2,6 @@ import Chat from "../models/chatSchema.js";
 import User from "../models/userSchema.js";
 
 export async function getChats(req, res) {
-
   const chatId = req.params.id;
 
   const isAuthorized = chatId.includes(req.userId);
@@ -41,6 +40,24 @@ export async function sendChats(req, res) {
 
     await Chat.create({ chatId, msg, userId: req.userId });
     res.success("chats was found successfully");
+  } catch (error) {
+    console.log("error", error);
+    res.fail(error, 500);
+  }
+}
+
+export async function changeToRead(req, res) {
+  const id = req.params.id;
+  const { chatId } = req.body;
+  const isAuthorized = chatId.includes(req.userId);
+  if (!isAuthorized) {
+    res.fail("You are not authorized!");
+    return;
+  }
+
+  try {
+    await Chat.findByIdAndUpdate(id, { isRead: true });
+    res.success("chats was updated successfully");
   } catch (error) {
     console.log("error", error);
     res.fail(error, 500);

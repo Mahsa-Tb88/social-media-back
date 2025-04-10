@@ -1,4 +1,5 @@
 import Category from "../models/categoryScheme.js";
+import Chat from "../models/chatSchema.js";
 import Friend from "../models/friendSchema.js";
 import User from "../models/userSchema.js";
 
@@ -17,7 +18,35 @@ export async function initialize(req, res) {
       if (!friends) {
         friends = { listFriend: [], viewer: "friends" };
       }
-      res.success("Initialized successfully!", { categories, user, friends });
+
+      //find unread msgs
+      const findMsgs = await Chat.find({
+        chatId: { $regex: user._id.toString() },
+      }).populate("userId");
+      console.log("findMsgs//", findMsgs);
+
+      const filterMsgs = findMsgs.filter(
+        (msg) => msg.isRead == false && msg.userId != user._id.toString()
+      );
+
+      let messages = [];
+      filterMsgs.forEach((msg) => {
+        let myMsg = {
+          chatId: msg.chatId,
+          username: msg.userId.username,
+          profileImg: msg.userId.profileImg,
+          id: msg._id,
+        };
+        messages.push(myMsg);
+      });
+
+      console.log("messages//", messages);
+      res.success("Initialized successfully!", {
+        categories,
+        user,
+        friends,
+        messages,
+      });
     } else {
       res.success("Initialized successfully!", { categories });
     }
