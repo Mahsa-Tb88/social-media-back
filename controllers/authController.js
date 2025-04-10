@@ -42,8 +42,8 @@ export async function loginUser(req, res) {
       viewer: findFriends?.viewer,
       userId: findFriends?.userId,
     };
-    messages = [];
-    res.success("Login Successfully", { user, friends, messaged });
+    let messages = [];
+    res.success("Login Successfully", { user, friends, messages });
   } catch (error) {
     res.fail(error.message);
   }

@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const chatSchema = new mongoose.Schema(
   {
     chatId: { type: String },
-    sender: { type: Object, default: {} },
-    receiver: { type: Object, default: {} },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    msg: { type: String },
   },
   { timestamps: true }
 );
