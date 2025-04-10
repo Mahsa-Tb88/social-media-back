@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/userSchema.js";
 import bcrypt from "bcrypt";
 import Friend from "../models/friendSchema.js";
+import Chat from "../models/chatSchema.js";
 
 export async function loginUser(req, res) {
   const { username, password, remember } = req.body;
@@ -42,8 +43,30 @@ export async function loginUser(req, res) {
       viewer: findFriends?.viewer,
       userId: findFriends?.userId,
     };
+
+    //find unread msgs
+    const findMsgs = await Chat.find({
+      chatId: { $regex: user._id.toString() },
+    }).populate("userId");
+    console.log("findMsgs//", findMsgs);
+
+    const filterMsgs = findMsgs.filter(
+      (msg) => msg.isRead == false && msg.userId != user._id.toString()
+    );
+
     let messages = [];
-    res.success("Login Successfully", { user, friends, messages });
+    filterMsgs.forEach((msg) => {
+      let myMsg = {
+        chatId: msg.chatId,
+        username: msg.userId.username,
+        profileImg: msg.userId.profileImg,
+        id: msg._id,
+      };
+      messages.push(myMsg);
+    });
+
+    console.log("messages//", messages);
+    res.success("Login Successfully", { user, friends, messagesy });
   } catch (error) {
     res.fail(error.message);
   }
