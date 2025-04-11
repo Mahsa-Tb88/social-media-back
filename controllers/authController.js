@@ -51,9 +51,10 @@ export async function loginUser(req, res) {
     // console.log("findMsgs//", findMsgs);
 
     const filterMsgs = findMsgs.filter(
-      (msg) => msg.isRead == false && msg.userId != user._id.toString()
+      (msg) =>
+        msg.isRead == false && msg.userId._id.toString() != user._id.toString()
     );
-
+    console.log("filterMsgs", filterMsgs);
     let findAllMessages = [];
     filterMsgs.forEach((msg) => {
       let myMsg = {
@@ -64,16 +65,17 @@ export async function loginUser(req, res) {
       };
       findAllMessages.push(myMsg);
     });
-    console.log("...", findAllMessages);
-    let messages = [];
-    const seenUsernames = new Set();
 
-    findAllMessages.forEach((m) => {
-      if (!seenUsernames.has(m.username)) {
-        messages.push(m);
-        seenUsernames.add(m.username);
+    const seenUsernames = new Set();
+    console.log("msgsss", findAllMessages);
+    const messages = findAllMessages.filter((user) => {
+      if (seenUsernames.has(user.username)) {
+        return false;
       }
+      seenUsernames.add(user.username);
+      return true;
     });
+
     console.log("messages//", messages);
 
     res.success("Login Successfully", { user, friends, messages });
