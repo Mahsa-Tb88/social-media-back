@@ -20,16 +20,20 @@ export async function initialize(req, res) {
       }
 
       //find unread msgs
+
+      //find all message with user
       const findMsgs = await Chat.find({
         chatId: { $regex: user._id.toString() },
       }).populate("userId");
-      console.log("findMsgs//", findMsgs);
 
+      //filter msg unread for user
       const filterMsgs = findMsgs.filter(
-        (msg) => msg.isRead == false && msg.userId != user._id.toString()
+        (msg) =>
+          msg.isRead == false &&
+          msg.userId._id.toString() != user._id.toString()
       );
 
-      let messages = [];
+      let findAllMessages = [];
       filterMsgs.forEach((msg) => {
         let myMsg = {
           chatId: msg.chatId,
@@ -37,10 +41,19 @@ export async function initialize(req, res) {
           profileImg: msg.userId.profileImg,
           id: msg._id,
         };
-        messages.push(myMsg);
+        findAllMessages.push(myMsg);
       });
 
-      console.log("messages//", messages);
+      //uniq unread msg for user
+      const seenUsernames = new Set();
+      const messages = findAllMessages.filter((user) => {
+        if (seenUsernames.has(user.username)) {
+          return false;
+        }
+        seenUsernames.add(user.username);
+        return true;
+      });
+
       res.success("Initialized successfully!", {
         categories,
         user,

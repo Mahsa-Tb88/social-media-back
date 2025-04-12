@@ -54,7 +54,7 @@ export async function loginUser(req, res) {
       (msg) =>
         msg.isRead == false && msg.userId._id.toString() != user._id.toString()
     );
-    console.log("filterMsgs", filterMsgs);
+    // console.log("filterMsgs", filterMsgs);
     let findAllMessages = [];
     filterMsgs.forEach((msg) => {
       let myMsg = {
@@ -67,7 +67,7 @@ export async function loginUser(req, res) {
     });
 
     const seenUsernames = new Set();
-    console.log("msgsss", findAllMessages);
+    // console.log("msgsss", findAllMessages);
     const messages = findAllMessages.filter((user) => {
       if (seenUsernames.has(user.username)) {
         return false;
@@ -76,7 +76,7 @@ export async function loginUser(req, res) {
       return true;
     });
 
-    console.log("messages//", messages);
+    // console.log("messages//", messages);
 
     res.success("Login Successfully", { user, friends, messages });
   } catch (error) {
