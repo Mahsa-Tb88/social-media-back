@@ -1,4 +1,5 @@
 import Friend from "../models/friendSchema.js";
+import Notification from "../models/notificationSchema.js";
 import Post from "../models/postSchema.js";
 import mongoose from "mongoose";
 
@@ -142,13 +143,6 @@ export async function commentOnPost(req, res) {
         return;
       }
     }
-    // if (
-    //   (post.viewer == "friends" && !isFriend && !isOwner) ||
-    //   (post.viewer == "private" && !isOwner)
-    // ) {
-    //   res.fail("You are not authorized to leave a comment!");
-    //   return;
-    // }
 
     let userComment;
     if (comment) {
@@ -161,6 +155,26 @@ export async function commentOnPost(req, res) {
       };
     }
     const updatedComments = [...post.comments, userComment];
+
+    const findUserNotification = await Notification.findOne({
+      userId: post.userId.toString(),
+    });
+    if (findUserNotification) {
+      const updatedNotifi = [
+        ...findUserNotification,
+        { userId, type: "comment", profileImg, username },
+      ];
+
+      await findoneAndUpdate(
+        { userId: post.userId.toString() },
+        { notification: updatedNotifi }
+      );
+    } else {
+      await Notification.create(
+        { userId: post.userId.toString() },
+        { notification: [{ userId, type: "comment", profileImg, username }] }
+      );
+    }
 
     await Post.findByIdAndUpdate(id, {
       comments: comment ? updatedComments : post.comments,

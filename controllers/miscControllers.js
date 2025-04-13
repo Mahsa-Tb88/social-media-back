@@ -40,6 +40,7 @@ export async function initialize(req, res) {
           username: msg.userId.username,
           profileImg: msg.userId.profileImg,
           id: msg._id,
+          msg: msg.msg,
         };
         findAllMessages.push(myMsg);
       });
