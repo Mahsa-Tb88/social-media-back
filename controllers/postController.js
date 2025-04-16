@@ -218,6 +218,29 @@ export async function likeOnPost(req, res) {
     await Post.findByIdAndUpdate(id, {
       like: updatedLike,
     });
+
+
+    const findUserNotification = await Notification.findOne({
+      userId: post.userId.toString(),
+    });
+    if (findUserNotification) {
+      const updatedNotifi = [
+        ...findUserNotification,
+        { userId, type: "comment", profileImg, username },
+      ];
+
+      await findoneAndUpdate(
+        { userId: post.userId.toString() },
+        { notification: updatedNotifi }
+      );
+    } else {
+      await Notification.create(
+        { userId: post.userId.toString() },
+        { notification: [{ userId, type: "comment", profileImg, username }] }
+      );
+    }
+
+
     res.success("like was updated successfully!", 200);
   } catch (error) {
     console.log("erorrr", error);
