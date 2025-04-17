@@ -63,7 +63,7 @@ export async function initialize(req, res) {
       });
 
       const notificationList = findNotification.notificationList;
-
+      console.log("...noto", findNotification);
       res.success("Initialized successfully!", {
         categories,
         user,

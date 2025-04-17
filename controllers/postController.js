@@ -159,12 +159,13 @@ export async function commentOnPost(req, res) {
     const findUserNotification = await Notification.findOne({
       userId: post.userId.toString(),
     });
-
+    console.log("postttt", post);
     if (findUserNotification) {
       const updatedNotifi = [
         ...findUserNotification.notificationList,
         {
           userId: req.body.userId,
+          postId: post._id.toString(),
           type: "comment",
           profileImg,
           username,
