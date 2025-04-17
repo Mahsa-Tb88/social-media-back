@@ -1,6 +1,7 @@
 import Category from "../models/categoryScheme.js";
 import Chat from "../models/chatSchema.js";
 import Friend from "../models/friendSchema.js";
+import Notification from "../models/notificationSchema.js";
 import User from "../models/userSchema.js";
 
 export async function initialize(req, res) {
@@ -55,11 +56,20 @@ export async function initialize(req, res) {
         return true;
       });
 
+      // find Notofication
+
+      const findNotification = await Notification.findOne({
+        userId: req.userId,
+      });
+
+      const notificationList = findNotification.notificationList;
+
       res.success("Initialized successfully!", {
         categories,
         user,
         friends,
         messages,
+        notificationList,
       });
     } else {
       res.success("Initialized successfully!", { categories });

@@ -3,6 +3,7 @@ import User from "../models/userSchema.js";
 import bcrypt from "bcrypt";
 import Friend from "../models/friendSchema.js";
 import Chat from "../models/chatSchema.js";
+import Notification from "../models/notificationSchema.js";
 
 export async function loginUser(req, res) {
   const { username, password, remember } = req.body;
@@ -48,13 +49,11 @@ export async function loginUser(req, res) {
     const findMsgs = await Chat.find({
       chatId: { $regex: user._id.toString() },
     }).populate("userId");
-    // console.log("findMsgs//", findMsgs);
 
     const filterMsgs = findMsgs.filter(
       (msg) =>
         msg.isRead == false && msg.userId._id.toString() != user._id.toString()
     );
-    // console.log("filterMsgs", filterMsgs);
     let findAllMessages = [];
     filterMsgs.forEach((msg) => {
       let myMsg = {
@@ -68,7 +67,6 @@ export async function loginUser(req, res) {
     });
 
     const seenUsernames = new Set();
-    // console.log("msgsss", findAllMessages);
     const messages = findAllMessages.filter((user) => {
       if (seenUsernames.has(user.username)) {
         return false;
@@ -77,11 +75,21 @@ export async function loginUser(req, res) {
       return true;
     });
 
-    // console.log("messages//", messages);
+    // find notification
 
-    res.success("Login Successfully", { user, friends, messages });
+    const findNotification = await Notification.findOne({
+      userId: user._id.toString(),
+    });
+    console.log("...", findNotification);
+    const notificationList = findNotification.notificationList;
+    res.success("Login Successfully", {
+      user,
+      friends,
+      messages,
+      notificationList,
+    });
   } catch (error) {
-    res.fail(error.message);
+    res.fail(error);
   }
 }
 

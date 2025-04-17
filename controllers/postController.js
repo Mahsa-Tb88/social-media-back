@@ -145,34 +145,45 @@ export async function commentOnPost(req, res) {
     }
 
     let userComment;
-    if (comment) {
-      userComment = {
-        comment,
-        username,
-        userId,
-        profileImg,
-        date: dateComment,
-      };
-    }
+
+    userComment = {
+      comment,
+      username,
+      userId,
+      profileImg,
+      date: dateComment,
+    };
+
     const updatedComments = [...post.comments, userComment];
 
     const findUserNotification = await Notification.findOne({
       userId: post.userId.toString(),
     });
+
     if (findUserNotification) {
       const updatedNotifi = [
-        ...findUserNotification,
-        { userId, type: "comment", profileImg, username },
+        ...findUserNotification.notificationList,
+        {
+          userId: req.body.userId,
+          type: "comment",
+          profileImg,
+          username,
+          date: Date.now(),
+        },
       ];
 
-      await findoneAndUpdate(
+      await Notification.findOneAndUpdate(
         { userId: post.userId.toString() },
-        { notification: updatedNotifi }
+        { notificationList: updatedNotifi }
       );
     } else {
       await Notification.create(
         { userId: post.userId.toString() },
-        { notification: [{ userId, type: "comment", profileImg, username }] }
+        {
+          notificationList: [
+            { userId, type: "comment", profileImg, username, date: Date.now() },
+          ],
+        }
       );
     }
 
@@ -219,7 +230,6 @@ export async function likeOnPost(req, res) {
       like: updatedLike,
     });
 
-
     const findUserNotification = await Notification.findOne({
       userId: post.userId.toString(),
     });
@@ -239,7 +249,6 @@ export async function likeOnPost(req, res) {
         { notification: [{ userId, type: "comment", profileImg, username }] }
       );
     }
-
 
     res.success("like was updated successfully!", 200);
   } catch (error) {
