@@ -61,9 +61,10 @@ export async function initialize(req, res) {
       const findNotification = await Notification.findOne({
         userId: req.userId,
       });
-
-      const notificationList = findNotification.notificationList;
-      console.log("...noto", findNotification);
+      let notificationList = [];
+      if (findNotification) {
+        notificationList = findNotification.notificationList;
+      }
       res.success("Initialized successfully!", {
         categories,
         user,
@@ -75,6 +76,7 @@ export async function initialize(req, res) {
       res.success("Initialized successfully!", { categories });
     }
   } catch (error) {
+    console.log("error is", error);
     res.fail(error.message, 500);
   }
 }

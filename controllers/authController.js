@@ -80,8 +80,10 @@ export async function loginUser(req, res) {
     const findNotification = await Notification.findOne({
       userId: user._id.toString(),
     });
-    console.log("...", findNotification);
-    const notificationList = findNotification.notificationList;
+    let notificationList = [];
+    if (findNotification) {
+      notificationList = findNotification.notificationList;
+    }
     res.success("Login Successfully", {
       user,
       friends,
