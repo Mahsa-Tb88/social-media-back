@@ -82,6 +82,7 @@ export async function createNewPost(req, res) {
     res.fail(error.message);
   }
 }
+
 export async function deletePost(req, res) {
   try {
     const findPost = await Post.findById(req.params.id);
@@ -102,6 +103,7 @@ export async function deletePost(req, res) {
     res.fail(error.message);
   }
 }
+
 export async function editPostById(req, res) {
   const { title, desc, image, video, feeling, viewer, userId, id } = req.body;
 
@@ -125,6 +127,7 @@ export async function editPostById(req, res) {
     res.fail(error.message);
   }
 }
+
 export async function commentOnPost(req, res) {
   const id = req.params.id;
   const { userId, username, profileImg, comment, dateComment } = req.body;
@@ -159,7 +162,7 @@ export async function commentOnPost(req, res) {
     const findUserNotification = await Notification.findOne({
       userId: post.userId.toString(),
     });
-    console.log("postttt", post);
+
     if (findUserNotification) {
       const updatedNotifi = [
         ...findUserNotification.notificationList,
@@ -170,6 +173,7 @@ export async function commentOnPost(req, res) {
           profileImg,
           username,
           date: Date.now(),
+          isSeen: false,
         },
       ];
 
@@ -197,6 +201,7 @@ export async function commentOnPost(req, res) {
     res.fail(error.message);
   }
 }
+
 export async function likeOnPost(req, res) {
   const id = req.params.id;
   const { userId, username, profileImg, isLike } = req.body;
@@ -258,6 +263,7 @@ export async function likeOnPost(req, res) {
     res.fail(error.message);
   }
 }
+
 export async function deleteComment(req, res) {
   const id = req.params.id;
   const { comments } = req.body;
