@@ -84,6 +84,7 @@ export async function loginUser(req, res) {
     if (findNotification) {
       notificationList = findNotification.notificationList;
     }
+    console.log("notooo", notificationList);
     res.success("Login Successfully", {
       user,
       friends,

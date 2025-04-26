@@ -293,3 +293,21 @@ export async function deleteComment(req, res) {
     res.fail(error.message);
   }
 }
+export async function updateIsSeenNotifi(req, res) {
+  const id = req.params.id;
+  const { userId } = req.body;
+
+  try {
+    if (req.userId != userId) {
+      res.fail("you are not authorized!");
+      return;
+    }
+    await Notification.findByIdAndUpdate(id, {
+      isSeen: true,
+    });
+    res.success("commnet was deleted successfully!", 200);
+  } catch (error) {
+    console.log("erorrr", error);
+    res.fail(error.message);
+  }
+}
