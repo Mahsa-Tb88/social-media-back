@@ -159,42 +159,18 @@ export async function commentOnPost(req, res) {
 
     const updatedComments = [...post.comments, userComment];
 
-    const findUserNotification = await Notification.findOne({
-      userId: post.userId.toString(),
-    });
-
-    if (findUserNotification) {
-      const updatedNotifi = [
-        ...findUserNotification.notificationList,
-        {
-          userId: req.body.userId,
-          postId: post._id.toString(),
-          type: "comment",
-          profileImg,
-          username,
-          date: Date.now(),
-          isSeen: false,
-        },
-      ];
-
-      await Notification.findOneAndUpdate(
-        { userId: post.userId.toString() },
-        { notificationList: updatedNotifi }
-      );
-    } else {
-      await Notification.create(
-        { userId: post.userId.toString() },
-        {
-          notificationList: [
-            { userId, type: "comment", profileImg, username, date: Date.now() },
-          ],
-        }
-      );
-    }
-
     await Post.findByIdAndUpdate(id, {
       comments: comment ? updatedComments : post.comments,
     });
+
+    // create notification
+    await Notification.create({
+      postId: id,
+      userId: post.userId.toString(),
+      profileImg,
+      username,
+    });
+
     res.success("Post was updated successfully!", 200);
   } catch (error) {
     console.log("erorrr", error);

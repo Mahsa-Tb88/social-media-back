@@ -2,8 +2,12 @@ import mongoose, { Schema } from "mongoose";
 
 const notificationSchema = new mongoose.Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    notificationList: { type: Array, default: [] },
+    userId: { type: String, required: true },
+    PostId: { type: String, required: true },
+    username: { type: String, required: true },
+    UserProfileImg: { type: String, required: true },
+    type: { type: String, default: "comment" },
+    isSeen: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

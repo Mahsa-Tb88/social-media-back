@@ -58,12 +58,21 @@ export async function initialize(req, res) {
 
       // find Notofication
 
-      const findNotification = await Notification.findOne({
-        userId: req.userId,
+      const findNotification = await Notification.find({
+        userId: user._id.toString(),
       });
       let notificationList = [];
       if (findNotification) {
-        notificationList = findNotification.notificationList;
+        const unSeenNotifi = findNotification.filter((n) => n.isSeen == false);
+        if (findNotification.length > 10) {
+          if (unSeenNotifi.length > 10) {
+            notificationList = unSeenNotifi;
+          } else {
+            notificationList = findNotification.slice(-10);
+          }
+        } else {
+          notificationList = findNotification;
+        }
       }
       res.success("Initialized successfully!", {
         categories,

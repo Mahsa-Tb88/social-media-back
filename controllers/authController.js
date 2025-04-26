@@ -75,14 +75,23 @@ export async function loginUser(req, res) {
       return true;
     });
 
-    // find notification
+    // find notification list 
 
-    const findNotification = await Notification.findOne({
+    const findNotification = await Notification.find({
       userId: user._id.toString(),
     });
     let notificationList = [];
     if (findNotification) {
-      notificationList = findNotification.notificationList;
+      const unSeenNotifi = findNotification.filter((n) => n.isSeen == false);
+      if (findNotification.length > 10) {
+        if (unSeenNotifi.length > 10) {
+          notificationList = unSeenNotifi;
+        } else {
+          notificationList = findNotification.slice(-10);
+        }
+      } else {
+        notificationList = findNotification;
+      }
     }
     console.log("notooo", notificationList);
     res.success("Login Successfully", {
