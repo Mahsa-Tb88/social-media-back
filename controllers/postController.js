@@ -302,9 +302,18 @@ export async function updateIsSeenNotifi(req, res) {
       res.fail("you are not authorized!");
       return;
     }
-    await Notification.findByIdAndUpdate(id, {
-      isSeen: true,
+    const findNotifi = await Notification.findOne({ userId });
+    const updatedList = findNotifi.notificationList.map((n) => {
+      if (n.date == id) {
+        return { ...n, isSeen: true };
+      } else {
+        return n;
+      }
     });
+    await Notification.findOneAndDelete(
+      { userId },
+      { notificationList: updatedList }
+    );
     res.success("commnet was deleted successfully!", 200);
   } catch (error) {
     console.log("erorrr", error);
