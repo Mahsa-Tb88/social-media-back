@@ -262,25 +262,14 @@ export async function deleteComment(req, res) {
 export async function updateIsSeenNotifi(req, res) {
   const id = req.params.id;
   const { userId } = req.body;
-
   try {
     if (req.userId != userId) {
       res.fail("you are not authorized!");
       return;
     }
-    const findNotifi = await Notification.findOne({ userId });
-    const updatedList = findNotifi.notificationList.map((n) => {
-      if (n.date == id) {
-        return { ...n, isSeen: true };
-      } else {
-        return n;
-      }
-    });
-    await Notification.findOneAndDelete(
-      { userId },
-      { notificationList: updatedList }
-    );
-    res.success("commnet was deleted successfully!", 200);
+    await Notification.findByIdAndUpdate(id, { isSeen: true });
+
+    res.success("notofication was updated successfully!", 200);
   } catch (error) {
     console.log("erorrr", error);
     res.fail(error.message);
