@@ -131,7 +131,6 @@ export async function editPostById(req, res) {
 export async function commentOnPost(req, res) {
   const id = req.params.id;
   const { userId, username, profileImg, comment, dateComment } = req.body;
-
   try {
     const post = await Post.findById(id);
     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
@@ -212,24 +211,15 @@ export async function likeOnPost(req, res) {
       like: updatedLike,
     });
 
-    const findUserNotification = await Notification.findOne({
-      userId: post.userId.toString(),
-    });
-    if (findUserNotification) {
-      const updatedNotifi = [
-        ...findUserNotification,
-        { userId, type: "comment", profileImg, username },
-      ];
-
-      await findoneAndUpdate(
-        { userId: post.userId.toString() },
-        { notification: updatedNotifi }
-      );
-    } else {
-      await Notification.create(
-        { userId: post.userId.toString() },
-        { notification: [{ userId, type: "comment", profileImg, username }] }
-      );
+    if (isLike) {
+      // create notification
+      await Notification.create({
+        postId: id,
+        userId: post.userId.toString(),
+        profileImg,
+        username,
+        type: "like",
+      });
     }
 
     res.success("like was updated successfully!", 200);
