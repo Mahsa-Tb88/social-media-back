@@ -6,6 +6,7 @@ const notificationSchema = new mongoose.Schema(
     postId: { type: String, required: true },
     username: { type: String, required: true },
     profileImg: { type: String },
+    comment: { type: String, default: "" },
     type: { type: String, default: "comment" },
     isSeen: { type: Boolean, default: false },
   },

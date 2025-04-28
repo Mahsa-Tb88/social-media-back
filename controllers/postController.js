@@ -128,16 +128,41 @@ export async function editPostById(req, res) {
   }
 }
 
+export async function getCommentsOfPost(req, res) {
+  const id = req.params.id;
+
+  try {
+    const post = await Post.findById(id);
+    const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+    const isFriend = findFriend.listFriend.find(
+      (f) => f.id == req.userId && f.status == "accepted"
+    );
+    const isOwner = post.userId.toString() == req.userId ? true : false;
+    if (!isOwner) {
+      if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
+        res.fail("You are not authorized to see comments!");
+        return;
+      }
+    }
+
+    const comments = await Comment.find({ postId: id });
+
+    res.success("commnets was found successfully!", comments);
+  } catch (error) {
+    console.log("erorrr", error);
+    res.fail(error.message);
+  }
+}
+
 export async function commentOnPost(req, res) {
   const id = req.params.id;
-  const { userId, username, profileImg, comment, dateComment } = req.body;
+  const { userId, username, profileImg, comment, type, replyId } = req.body;
   try {
     const post = await Post.findById(id);
     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
     const isFriend = findFriend.listFriend.find(
       (f) => f.id == userId && f.status == "accepted"
     );
-
     const isOwner = post.userId.toString() == userId ? true : false;
     if (!isOwner) {
       if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
@@ -147,32 +172,28 @@ export async function commentOnPost(req, res) {
     }
 
     // create notification
-    // nabayad vaghti khode shakhs payam baray khodesh migzare notifi ijad she baraye khodesh
-    // vali baraye reply be shakhse dige chera notifi baraye on bere
+
     const newNotifi = await Notification.create({
       postId: id,
       userId: post.userId.toString(),
       profileImg,
       username,
+      comment,
+      type,
     });
 
     //create comment
 
-    let userComment;
-    userComment = {
-      comment,
-      username,
+    await Comment.create({
+      postId: id,
       userId,
-      profileImg,
-      date: dateComment,
       notifiId: newNotifi._id.toString(),
-    };
-
-    const updatedComments = [...post.comments, userComment];
-    await Post.findByIdAndUpdate(id, {
-      comments: comment ? updatedComments : post.comments,
+      username,
+      profileImg,
+      text: comment,
+      replyId: replyId ? replyId : "",
     });
-    res.success("Post was updated successfully!", 200);
+    res.success("Changes was updated successfully!", 200);
   } catch (error) {
     console.log("erorrr", error);
     res.fail(error.message);

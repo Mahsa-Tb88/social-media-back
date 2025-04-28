@@ -9,7 +9,6 @@ const commentSchema = new mongoose.Schema(
     username: { type: String, require: true },
     profileImg: { type: String, require: true },
     like: { type: Array, default: [] },
-    wasReplied: { type: Boolean, default: false },
     replyId: { type: String, default: "" },
   },
   { timestamps: true }

@@ -8,7 +8,8 @@ import {
   commentOnPost,
   deleteComment,
   likeOnPost,
-  updateIsSeenNotifi
+  updateIsSeenNotifi,
+  getCommentsOfPost,
 } from "../controllers/postController.js";
 
 const router = express.Router();
@@ -22,5 +23,6 @@ router.put("/comment/:id", commentOnPost);
 router.put("/like/:id", likeOnPost);
 router.put("/notification/:id", updateIsSeenNotifi);
 router.put("/comment/delete/:id", deleteComment);
+router.get("/comments/:id", getCommentsOfPost);
 
 export default router;
