@@ -146,17 +146,19 @@ export async function commentOnPost(req, res) {
       }
     }
 
-    let userComment;
-
-    const updatedComments = [...post.comments, userComment];
-
     // create notification
+    // nabayad vaghti khode shakhs payam baray khodesh migzare notifi ijad she baraye khodesh
+    // vali baraye reply be shakhse dige chera notifi baraye on bere
     const newNotifi = await Notification.create({
       postId: id,
       userId: post.userId.toString(),
       profileImg,
       username,
     });
+
+    //create comment
+
+    let userComment;
     userComment = {
       comment,
       username,
@@ -165,6 +167,8 @@ export async function commentOnPost(req, res) {
       date: dateComment,
       notifiId: newNotifi._id.toString(),
     };
+
+    const updatedComments = [...post.comments, userComment];
     await Post.findByIdAndUpdate(id, {
       comments: comment ? updatedComments : post.comments,
     });
@@ -252,9 +256,9 @@ export async function deleteComment(req, res) {
       comments: comments ? comments : post.comments,
     });
     console.log("comment", comments);
-    //remove notification if message is still unseen
 
-    const findNotifi = await Notification.findByIdAndDelete(notifiId);
+    //remove notification
+    await Notification.findByIdAndDelete(notifiId);
 
     res.success("commnet was delete successfully!", 200);
   } catch (error) {

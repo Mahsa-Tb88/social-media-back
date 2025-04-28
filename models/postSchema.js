@@ -10,7 +10,6 @@ const postSchema = new mongoose.Schema(
     feeling: { type: String, default: "" },
     viewer: { type: String, default: "friends" },
     like: { type: [Object], default: [] },
-    comments: { type: [Object], default: [] },
   },
   { timestamps: true }
 );
