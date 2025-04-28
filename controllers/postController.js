@@ -148,28 +148,26 @@ export async function commentOnPost(req, res) {
 
     let userComment;
 
+    const updatedComments = [...post.comments, userComment];
+
+    // create notification
+    const newNotifi = await Notification.create({
+      postId: id,
+      userId: post.userId.toString(),
+      profileImg,
+      username,
+    });
     userComment = {
       comment,
       username,
       userId,
       profileImg,
       date: dateComment,
+      notifiId: newNotifi._id.toString(),
     };
-
-    const updatedComments = [...post.comments, userComment];
-
     await Post.findByIdAndUpdate(id, {
       comments: comment ? updatedComments : post.comments,
     });
-
-    // create notification
-    await Notification.create({
-      postId: id,
-      userId: post.userId.toString(),
-      profileImg,
-      username,
-    });
-
     res.success("Post was updated successfully!", 200);
   } catch (error) {
     console.log("erorrr", error);
@@ -232,7 +230,7 @@ export async function likeOnPost(req, res) {
 
 export async function deleteComment(req, res) {
   const id = req.params.id;
-  const { comments } = req.body;
+  const { comments, notifiId } = req.body;
 
   try {
     const post = await Post.findById(id);
@@ -245,7 +243,7 @@ export async function deleteComment(req, res) {
     const isOwner = post.userId.toString() == req.userId ? true : false;
     if (!isOwner) {
       if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
-        res.fail("You are not authorized to leave a comment!");
+        res.fail("You are not authorized to delete the comment!");
         return;
       }
     }
@@ -253,6 +251,11 @@ export async function deleteComment(req, res) {
     await Post.findByIdAndUpdate(id, {
       comments: comments ? comments : post.comments,
     });
+    console.log("comment", comments);
+    //remove notification if message is still unseen
+
+    const findNotifi = await Notification.findByIdAndDelete(notifiId);
+
     res.success("commnet was delete successfully!", 200);
   } catch (error) {
     console.log("erorrr", error);
