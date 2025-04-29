@@ -1,3 +1,4 @@
+import Comment from "../models/commentSchema.js";
 import Friend from "../models/friendSchema.js";
 import Notification from "../models/notificationSchema.js";
 import Post from "../models/postSchema.js";
@@ -128,7 +129,7 @@ export async function editPostById(req, res) {
   }
 }
 
-export async function getCommentsOfPost(req, res) {
+export async function getAllCommentsOfPost(req, res) {
   const id = req.params.id;
 
   try {
@@ -159,7 +160,9 @@ export async function commentOnPost(req, res) {
   const { userId, username, profileImg, comment, type, replyId } = req.body;
   try {
     const post = await Post.findById(id);
+
     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+
     const isFriend = findFriend.listFriend.find(
       (f) => f.id == userId && f.status == "accepted"
     );
@@ -181,18 +184,34 @@ export async function commentOnPost(req, res) {
       comment,
       type,
     });
+    
 
     //create comment
 
-    await Comment.create({
-      postId: id,
-      userId,
-      notifiId: newNotifi._id.toString(),
-      username,
-      profileImg,
-      text: comment,
-      replyId: replyId ? replyId : "",
-    });
+    if (type == "comment") {
+      await Comment.create({
+        postId: id,
+        userId,
+        notifiId: newNotifi._id.toString(),
+        username,
+        profileImg,
+        text: comment,
+      });
+    } else {
+      const findComment = await Comment.findById(replyId);
+      const replyComment = {
+        replyId,
+        postId: id,
+        userId,
+        notifiId: newNotifi._id.toString(),
+        username,
+        profileImg,
+        text: comment,
+      };
+      const updatedReply = [...findComment, replyComment];
+      await Comment.findByIdAndUpdate(replyId, { reply: updatedReply });
+    }
+
     res.success("Changes was updated successfully!", 200);
   } catch (error) {
     console.log("erorrr", error);
@@ -255,10 +274,10 @@ export async function likeOnPost(req, res) {
 
 export async function deleteComment(req, res) {
   const id = req.params.id;
-  const { comments, notifiId } = req.body;
+  const { notifiId, postId } = req.body;
 
   try {
-    const post = await Post.findById(id);
+    const post = await Post.findById(postId);
 
     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
     const isFriend = findFriend.listFriend.find(
@@ -273,10 +292,8 @@ export async function deleteComment(req, res) {
       }
     }
 
-    await Post.findByIdAndUpdate(id, {
-      comments: comments ? comments : post.comments,
-    });
-    console.log("comment", comments);
+    //remove comment
+    await Comment.findByIdAndDelete(id);
 
     //remove notification
     await Notification.findByIdAndDelete(notifiId);

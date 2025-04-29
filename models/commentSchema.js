@@ -9,7 +9,7 @@ const commentSchema = new mongoose.Schema(
     username: { type: String, require: true },
     profileImg: { type: String, require: true },
     like: { type: Array, default: [] },
-    replyId: { type: String, default: "" },
+    reply: { type: Array, default: [] },
   },
   { timestamps: true }
 );

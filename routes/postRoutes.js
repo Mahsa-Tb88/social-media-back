@@ -9,7 +9,7 @@ import {
   deleteComment,
   likeOnPost,
   updateIsSeenNotifi,
-  getCommentsOfPost,
+  getAllCommentsOfPost,
 } from "../controllers/postController.js";
 
 const router = express.Router();
@@ -23,6 +23,6 @@ router.put("/comment/:id", commentOnPost);
 router.put("/like/:id", likeOnPost);
 router.put("/notification/:id", updateIsSeenNotifi);
 router.put("/comment/delete/:id", deleteComment);
-router.get("/comments/:id", getCommentsOfPost);
+router.get("/comments/:id", getAllCommentsOfPost);
 
 export default router;
