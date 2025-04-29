@@ -10,6 +10,7 @@ const commentSchema = new mongoose.Schema(
     profileImg: { type: String, require: true },
     like: { type: Array, default: [] },
     reply: { type: Array, default: [] },
+    replyId: { type: String, default: "" },
   },
   { timestamps: true }
 );

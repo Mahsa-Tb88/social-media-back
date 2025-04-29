@@ -158,8 +158,10 @@ export async function getAllCommentsOfPost(req, res) {
 export async function commentOnPost(req, res) {
   const id = req.params.id;
   const { userId, username, profileImg, comment, type, replyId } = req.body;
+  console.log("...", req.body);
   try {
     const post = await Post.findById(id);
+    console.log("posttt", post);
 
     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
 
@@ -175,7 +177,6 @@ export async function commentOnPost(req, res) {
     }
 
     // create notification
-
     const newNotifi = await Notification.create({
       postId: id,
       userId: post.userId.toString(),
@@ -184,12 +185,12 @@ export async function commentOnPost(req, res) {
       comment,
       type,
     });
-    
 
     //create comment
-
     if (type == "comment") {
-      await Comment.create({
+      console.log("yeee");
+
+      const oo = await Comment.create({
         postId: id,
         userId,
         notifiId: newNotifi._id.toString(),
@@ -197,6 +198,7 @@ export async function commentOnPost(req, res) {
         profileImg,
         text: comment,
       });
+      console.log("oo", oo);
     } else {
       const findComment = await Comment.findById(replyId);
       const replyComment = {
@@ -208,7 +210,8 @@ export async function commentOnPost(req, res) {
         profileImg,
         text: comment,
       };
-      const updatedReply = [...findComment, replyComment];
+
+      const updatedReply = [...findComment.reply, replyComment];
       await Comment.findByIdAndUpdate(replyId, { reply: updatedReply });
     }
 
