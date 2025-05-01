@@ -11,6 +11,7 @@ import {
   updateIsSeenNotifi,
   getAllCommentsOfPost,
   likeOnComment,
+  likeOnReplyComment,
 } from "../controllers/postController.js";
 
 const router = express.Router();
@@ -28,5 +29,6 @@ router.put("/notification/:id", updateIsSeenNotifi);
 router.put("/comment/delete/:id", deleteComment);
 router.get("/comments/:id", getAllCommentsOfPost);
 router.put("/comment/like/:id", likeOnComment);
+router.put("/reply/like/:id", likeOnReplyComment);
 
 export default router;

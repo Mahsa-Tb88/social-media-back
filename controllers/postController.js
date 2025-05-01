@@ -203,7 +203,6 @@ export async function commentOnPost(req, res) {
         postId: id,
         userId,
         notifiId: newNotifi._id.toString(),
-        _id: "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
         username,
         profileImg,
         text: comment,
@@ -362,6 +361,87 @@ export async function likeOnComment(req, res) {
     });
 
     if (isLike) {
+      // create notification
+      await Notification.create({
+        postId: id,
+        userId: post.userId.toString(),
+        profileImg,
+        username,
+        type: "like",
+      });
+    }
+
+    res.success("like was updated successfully!", 200);
+  } catch (error) {
+    console.log("erorrr", error);
+
+    res.fail(error.message);
+  }
+}
+
+export async function likeOnReplyComment(req, res) {
+  // id is for comment modal
+  const id = req.params.id;
+  const { userId, username, profileImg, postId, notifiId } = req.body;
+  console.log("req", req.body);
+
+  try {
+    const post = await Post.findById(postId);
+    const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+    const isFriend = findFriend.listFriend.find(
+      (f) => f.id == userId && f.status == "accepted"
+    );
+
+    const isOwner = post.userId.toString() == userId ? true : false;
+    if (!isOwner) {
+      if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
+        res.fail("You are not authorized to like!");
+        return;
+      }
+    }
+    //first find comment
+    const comment = await Comment.findById(id);
+    console.log("comment", comment);
+    let updatedReply = [];
+    let updatedLike;
+    // second find reply
+    const findReply = comment.reply.find((r) => r.notifiId == notifiId);
+    //third find like
+    const findLike = findReply.like.find((r) => r.userId == req.userId);
+
+    if (!findLike) {
+      const newLike = {
+        userId,
+        username,
+        profileImg,
+        postId,
+        // notifiId:create notifiid for shwing notification
+      };
+
+      updatedReply = comment.reply.map((r) => {
+        if (r.notifiId == notifiId) {
+          const updatedLike = [...r.like, newLike];
+          return { ...r, like: updatedLike };
+        } else {
+          return r;
+        }
+      });
+    } else {
+      const updatedLike = findReply.like.filter((l) => l.userId != req.userId);
+      updatedReply = comment.reply.map((r) => {
+        if (r.notifiId == notifiId) {
+          return { ...r, like: updatedLike };
+        } else {
+          return r;
+        }
+      });
+    }
+
+    await Comment.findByIdAndUpdate(id, {
+      reply: updatedReply,
+    });
+
+    if (!findLike) {
       // create notification
       await Notification.create({
         postId: id,
