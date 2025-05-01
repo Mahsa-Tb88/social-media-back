@@ -188,9 +188,7 @@ export async function commentOnPost(req, res) {
 
     //create comment
     if (type == "comment") {
-      console.log("yeee");
-
-      const oo = await Comment.create({
+      await Comment.create({
         postId: id,
         userId,
         notifiId: newNotifi._id.toString(),
@@ -198,7 +196,6 @@ export async function commentOnPost(req, res) {
         profileImg,
         text: comment,
       });
-      console.log("oo", oo);
     } else {
       const findComment = await Comment.findById(replyId);
       const replyComment = {
@@ -206,9 +203,12 @@ export async function commentOnPost(req, res) {
         postId: id,
         userId,
         notifiId: newNotifi._id.toString(),
+        _id: "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
         username,
         profileImg,
         text: comment,
+        like: [],
+        createdAt: new Date(),
       };
 
       const updatedReply = [...findComment.reply, replyComment];
@@ -320,6 +320,62 @@ export async function updateIsSeenNotifi(req, res) {
     res.success("notofication was updated successfully!", 200);
   } catch (error) {
     console.log("erorrr", error);
+    res.fail(error.message);
+  }
+}
+export async function likeOnComment(req, res) {
+  const id = req.params.id;
+  const { userId, username, profileImg, isLike, postId } = req.body;
+  console.log("req", req.body);
+
+  try {
+    const post = await Post.findById(postId);
+    const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+    const isFriend = findFriend.listFriend.find(
+      (f) => f.id == userId && f.status == "accepted"
+    );
+
+    const isOwner = post.userId.toString() == userId ? true : false;
+    if (!isOwner) {
+      if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
+        res.fail("You are not authorized to like!");
+        return;
+      }
+    }
+
+    const comment = await Comment.findById(id);
+    console.log("comment", comment);
+    let updatedLike = [];
+    if (isLike) {
+      let newLike = {
+        username,
+        userId,
+        profileImg,
+      };
+
+      updatedLike = [...comment.like, newLike];
+    } else {
+      updatedLike = post.like.filter((l) => l.userId != userId);
+    }
+    await Comment.findByIdAndUpdate(id, {
+      like: updatedLike,
+    });
+
+    if (isLike) {
+      // create notification
+      await Notification.create({
+        postId: id,
+        userId: post.userId.toString(),
+        profileImg,
+        username,
+        type: "like",
+      });
+    }
+
+    res.success("like was updated successfully!", 200);
+  } catch (error) {
+    console.log("erorrr", error);
+
     res.fail(error.message);
   }
 }
