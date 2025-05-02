@@ -156,13 +156,11 @@ export async function getAllCommentsOfPost(req, res) {
 }
 
 export async function commentOnPost(req, res) {
-  const id = req.params.id;
+  const postId = req.params.id;
   const { userId, username, profileImg, comment, type, replyId } = req.body;
   console.log("...", req.body);
   try {
-    const post = await Post.findById(id);
-    console.log("posttt", post);
-
+    const post = await Post.findById(postId);
     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
 
     const isFriend = findFriend.listFriend.find(
@@ -178,7 +176,7 @@ export async function commentOnPost(req, res) {
 
     // create notification
     const newNotifi = await Notification.create({
-      postId: id,
+      postId,
       userId: post.userId.toString(),
       profileImg,
       username,
@@ -187,9 +185,12 @@ export async function commentOnPost(req, res) {
     });
 
     //create comment
+    //we have 2 types of comment, comment in first layer
+    //  and second comment as reply to first layer comment, for first comment using id they identify
+    // so we need notifiId to identify spesific reply comment
     if (type == "comment") {
       await Comment.create({
-        postId: id,
+        postId,
         userId,
         notifiId: newNotifi._id.toString(),
         username,
@@ -200,13 +201,12 @@ export async function commentOnPost(req, res) {
       const findComment = await Comment.findById(replyId);
       const replyComment = {
         replyId,
-        postId: id,
+        postId,
         userId,
         notifiId: newNotifi._id.toString(),
         username,
         profileImg,
         text: comment,
-        like: [],
         createdAt: new Date(),
       };
 
@@ -459,3 +459,4 @@ export async function likeOnReplyComment(req, res) {
     res.fail(error.message);
   }
 }
+

@@ -3,7 +3,7 @@ import {
   changeToRead,
   getChats,
   sendChats,
-  getAllMsgOfUser
+  getAllMsgOfUser,
 } from "../controllers/chatController.js";
 
 const router = express.Router();
