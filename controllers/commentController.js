@@ -19,9 +19,12 @@ export async function getcommentsPost(req, res) {
       }
     }
 
-    const comments = await Comment.find({ postId: id, replyTo: null }).populate(
-      "replies"
-    );
+    const comments = await Comment.find({ postId: id, replyTo: null })
+      .populate("replies")
+      .populate({
+        path: "userId",
+        select: "username profileImg _id", // only include these fields
+      });
 
     res.success("commnets was found successfully!", comments);
   } catch (error) {
@@ -32,7 +35,7 @@ export async function getcommentsPost(req, res) {
 
 export async function leaveComment(req, res) {
   const id = req.params.id;
-  const { postId, userId, text } = req.body;
+  const { postId, userId, text, replyTo } = req.body;
 
   try {
     const post = await Post.findById(id);
@@ -52,11 +55,23 @@ export async function leaveComment(req, res) {
       }
     }
 
-    await Comment.create({
-      postId,
-      userId,
-      text,
-    });
+    if (replyTo) {
+      const newComment = await Comment.create({
+        postId,
+        userId,
+        text,
+        replyTo,
+      });
+      await Comment.findByIdAndUpdate(replyTo, {
+        $push: { replies: newComment._id },
+      });
+    } else {
+      await Comment.create({
+        postId,
+        userId,
+        text,
+      });
+    }
 
     res.success("commnent was added successfully!", 200);
   } catch (error) {

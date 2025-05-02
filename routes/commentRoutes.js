@@ -7,6 +7,6 @@ import {
 const router = express.Router();
 
 router.get("/:id", getcommentsPost);
-router.get("/:id", leaveComment);
+router.post("/:id", leaveComment);
 
 export default router;
