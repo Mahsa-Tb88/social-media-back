@@ -1,6 +1,5 @@
-import Comment from "../models/commentSchema.js";
 import Friend from "../models/friendSchema.js";
-import Notification from "../models/notificationSchema.js";
+// import Notification from "../models/notificationSchema.js";
 import Post from "../models/postSchema.js";
 import mongoose from "mongoose";
 
@@ -129,334 +128,333 @@ export async function editPostById(req, res) {
   }
 }
 
-export async function getAllCommentsOfPost(req, res) {
-  const id = req.params.id;
+// export async function getAllCommentsOfPost(req, res) {
+//   const id = req.params.id;
 
-  try {
-    const post = await Post.findById(id);
-    const findFriend = await Friend.findOne({ userId: post.userId.toString() });
-    const isFriend = findFriend.listFriend.find(
-      (f) => f.id == req.userId && f.status == "accepted"
-    );
-    const isOwner = post.userId.toString() == req.userId ? true : false;
-    if (!isOwner) {
-      if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
-        res.fail("You are not authorized to see comments!");
-        return;
-      }
-    }
+//   try {
+//     const post = await Post.findById(id);
+//     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+//     const isFriend = findFriend.listFriend.find(
+//       (f) => f.id == req.userId && f.status == "accepted"
+//     );
+//     const isOwner = post.userId.toString() == req.userId ? true : false;
+//     if (!isOwner) {
+//       if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
+//         res.fail("You are not authorized to see comments!");
+//         return;
+//       }
+//     }
 
-    const comments = await Comment.find({ postId: id });
+//     const comments = await Comment.find({ postId: id });
 
-    res.success("commnets was found successfully!", comments);
-  } catch (error) {
-    console.log("erorrr", error);
-    res.fail(error.message);
-  }
-}
+//     res.success("commnets was found successfully!", comments);
+//   } catch (error) {
+//     console.log("erorrr", error);
+//     res.fail(error.message);
+//   }
+// }
 
-export async function commentOnPost(req, res) {
-  const postId = req.params.id;
-  const { userId, username, profileImg, comment, type, replyId } = req.body;
-  console.log("...", req.body);
-  try {
-    const post = await Post.findById(postId);
-    const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+// export async function commentOnPost(req, res) {
+//   const postId = req.params.id;
+//   const { userId, username, profileImg, comment, type, replyId } = req.body;
+//   console.log("...", req.body);
+//   try {
+//     const post = await Post.findById(postId);
+//     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
 
-    const isFriend = findFriend.listFriend.find(
-      (f) => f.id == userId && f.status == "accepted"
-    );
-    const isOwner = post.userId.toString() == userId ? true : false;
-    if (!isOwner) {
-      if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
-        res.fail("You are not authorized to leave a comment!");
-        return;
-      }
-    }
+//     const isFriend = findFriend.listFriend.find(
+//       (f) => f.id == userId && f.status == "accepted"
+//     );
+//     const isOwner = post.userId.toString() == userId ? true : false;
+//     if (!isOwner) {
+//       if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
+//         res.fail("You are not authorized to leave a comment!");
+//         return;
+//       }
+//     }
 
-    // create notification
-    const newNotifi = await Notification.create({
-      postId,
-      userId: post.userId.toString(),
-      profileImg,
-      username,
-      comment,
-      type,
-    });
+//     // create notification
+//     const newNotifi = await Notification.create({
+//       postId,
+//       userId: post.userId.toString(),
+//       profileImg,
+//       username,
+//       comment,
+//       type,
+//     });
 
-    //create comment
-    //we have 2 types of comment, comment in first layer
-    //  and second comment as reply to first layer comment, for first comment using id they identify
-    // so we need notifiId to identify spesific reply comment
-    if (type == "comment") {
-      await Comment.create({
-        postId,
-        userId,
-        notifiId: newNotifi._id.toString(),
-        username,
-        profileImg,
-        text: comment,
-      });
-    } else {
-      const findComment = await Comment.findById(replyId);
-      const replyComment = {
-        replyId,
-        postId,
-        userId,
-        notifiId: newNotifi._id.toString(),
-        username,
-        profileImg,
-        text: comment,
-        createdAt: new Date(),
-      };
+//     //create comment
+//     //we have 2 types of comment, comment in first layer
+//     //  and second comment as reply to first layer comment, for first comment using id they identify
+//     // so we need notifiId to identify spesific reply comment
+//     if (type == "comment") {
+//       await Comment.create({
+//         postId,
+//         userId,
+//         notifiId: newNotifi._id.toString(),
+//         username,
+//         profileImg,
+//         text: comment,
+//       });
+//     } else {
+//       const findComment = await Comment.findById(replyId);
+//       const replyComment = {
+//         replyId,
+//         postId,
+//         userId,
+//         notifiId: newNotifi._id.toString(),
+//         username,
+//         profileImg,
+//         text: comment,
+//         createdAt: new Date(),
+//       };
 
-      const updatedReply = [...findComment.reply, replyComment];
-      await Comment.findByIdAndUpdate(replyId, { reply: updatedReply });
-    }
+//       const updatedReply = [...findComment.reply, replyComment];
+//       await Comment.findByIdAndUpdate(replyId, { reply: updatedReply });
+//     }
 
-    res.success("Changes was updated successfully!", 200);
-  } catch (error) {
-    console.log("erorrr", error);
-    res.fail(error.message);
-  }
-}
+//     res.success("Changes was updated successfully!", 200);
+//   } catch (error) {
+//     console.log("erorrr", error);
+//     res.fail(error.message);
+//   }
+// }
 
-export async function likeOnPost(req, res) {
-  const id = req.params.id;
-  const { userId, username, profileImg, isLike } = req.body;
+// export async function likeOnPost(req, res) {
+//   const id = req.params.id;
+//   const { userId, username, profileImg, isLike } = req.body;
 
-  try {
-    const post = await Post.findById(id);
-    const findFriend = await Friend.findOne({ userId: post.userId.toString() });
-    const isFriend = findFriend.listFriend.find(
-      (f) => f.id == userId && f.status == "accepted"
-    );
+//   try {
+//     const post = await Post.findById(id);
+//     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+//     const isFriend = findFriend.listFriend.find(
+//       (f) => f.id == userId && f.status == "accepted"
+//     );
 
-    const isOwner = post.userId.toString() == userId ? true : false;
-    if (!isOwner) {
-      if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
-        res.fail("You are not authorized to like!");
-        return;
-      }
-    }
-    let updatedLike = [];
-    if (isLike) {
-      let newLike = {
-        username,
-        userId,
-        profileImg,
-      };
+//     const isOwner = post.userId.toString() == userId ? true : false;
+//     if (!isOwner) {
+//       if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
+//         res.fail("You are not authorized to like!");
+//         return;
+//       }
+//     }
+//     let updatedLike = [];
+//     if (isLike) {
+//       let newLike = {
+//         username,
+//         userId,
+//         profileImg,
+//       };
 
-      updatedLike = [...post.like, newLike];
-    } else {
-      updatedLike = post.like.filter((l) => l.userId != userId);
-    }
-    await Post.findByIdAndUpdate(id, {
-      like: updatedLike,
-    });
+//       updatedLike = [...post.like, newLike];
+//     } else {
+//       updatedLike = post.like.filter((l) => l.userId != userId);
+//     }
+//     await Post.findByIdAndUpdate(id, {
+//       like: updatedLike,
+//     });
 
-    if (isLike) {
-      // create notification
-      await Notification.create({
-        postId: id,
-        userId: post.userId.toString(),
-        profileImg,
-        username,
-        type: "like",
-      });
-    }
+//     if (isLike) {
+//       // create notification
+//       await Notification.create({
+//         postId: id,
+//         userId: post.userId.toString(),
+//         profileImg,
+//         username,
+//         type: "like",
+//       });
+//     }
 
-    res.success("like was updated successfully!", 200);
-  } catch (error) {
-    console.log("erorrr", error);
+//     res.success("like was updated successfully!", 200);
+//   } catch (error) {
+//     console.log("erorrr", error);
 
-    res.fail(error.message);
-  }
-}
+//     res.fail(error.message);
+//   }
+// }
 
-export async function deleteComment(req, res) {
-  const id = req.params.id;
-  const { notifiId, postId } = req.body;
+// export async function deleteComment(req, res) {
+//   const id = req.params.id;
+//   const { notifiId, postId } = req.body;
 
-  try {
-    const post = await Post.findById(postId);
+//   try {
+//     const post = await Post.findById(postId);
 
-    const findFriend = await Friend.findOne({ userId: post.userId.toString() });
-    const isFriend = findFriend.listFriend.find(
-      (f) => f.id == req.userId && f.status == "accepted"
-    );
+//     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+//     const isFriend = findFriend.listFriend.find(
+//       (f) => f.id == req.userId && f.status == "accepted"
+//     );
 
-    const isOwner = post.userId.toString() == req.userId ? true : false;
-    if (!isOwner) {
-      if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
-        res.fail("You are not authorized to delete the comment!");
-        return;
-      }
-    }
+//     const isOwner = post.userId.toString() == req.userId ? true : false;
+//     if (!isOwner) {
+//       if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
+//         res.fail("You are not authorized to delete the comment!");
+//         return;
+//       }
+//     }
 
-    //remove comment
-    await Comment.findByIdAndDelete(id);
+//     //remove comment
+//     await Comment.findByIdAndDelete(id);
 
-    //remove notification
-    await Notification.findByIdAndDelete(notifiId);
+//     //remove notification
+//     await Notification.findByIdAndDelete(notifiId);
 
-    res.success("commnet was delete successfully!", 200);
-  } catch (error) {
-    console.log("erorrr", error);
-    res.fail(error.message);
-  }
-}
-export async function updateIsSeenNotifi(req, res) {
-  const id = req.params.id;
-  const { userId } = req.body;
-  try {
-    if (req.userId != userId) {
-      res.fail("you are not authorized!");
-      return;
-    }
-    await Notification.findByIdAndUpdate(id, { isSeen: true });
+//     res.success("commnet was delete successfully!", 200);
+//   } catch (error) {
+//     console.log("erorrr", error);
+//     res.fail(error.message);
+//   }
+// }
+// export async function updateIsSeenNotifi(req, res) {
+//   const id = req.params.id;
+//   const { userId } = req.body;
+//   try {
+//     if (req.userId != userId) {
+//       res.fail("you are not authorized!");
+//       return;
+//     }
+//     await Notification.findByIdAndUpdate(id, { isSeen: true });
 
-    res.success("notofication was updated successfully!", 200);
-  } catch (error) {
-    console.log("erorrr", error);
-    res.fail(error.message);
-  }
-}
-export async function likeOnComment(req, res) {
-  const id = req.params.id;
-  const { userId, username, profileImg, isLike, postId } = req.body;
-  console.log("req", req.body);
+//     res.success("notofication was updated successfully!", 200);
+//   } catch (error) {
+//     console.log("erorrr", error);
+//     res.fail(error.message);
+//   }
+// }
+// export async function likeOnComment(req, res) {
+//   const id = req.params.id;
+//   const { userId, username, profileImg, isLike, postId } = req.body;
+//   console.log("req", req.body);
 
-  try {
-    const post = await Post.findById(postId);
-    const findFriend = await Friend.findOne({ userId: post.userId.toString() });
-    const isFriend = findFriend.listFriend.find(
-      (f) => f.id == userId && f.status == "accepted"
-    );
+//   try {
+//     const post = await Post.findById(postId);
+//     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+//     const isFriend = findFriend.listFriend.find(
+//       (f) => f.id == userId && f.status == "accepted"
+//     );
 
-    const isOwner = post.userId.toString() == userId ? true : false;
-    if (!isOwner) {
-      if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
-        res.fail("You are not authorized to like!");
-        return;
-      }
-    }
+//     const isOwner = post.userId.toString() == userId ? true : false;
+//     if (!isOwner) {
+//       if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
+//         res.fail("You are not authorized to like!");
+//         return;
+//       }
+//     }
 
-    const comment = await Comment.findById(id);
-    console.log("comment", comment);
-    let updatedLike = [];
-    if (isLike) {
-      let newLike = {
-        username,
-        userId,
-        profileImg,
-      };
+//     const comment = await Comment.findById(id);
+//     console.log("comment", comment);
+//     let updatedLike = [];
+//     if (isLike) {
+//       let newLike = {
+//         username,
+//         userId,
+//         profileImg,
+//       };
 
-      updatedLike = [...comment.like, newLike];
-    } else {
-      updatedLike = post.like.filter((l) => l.userId != userId);
-    }
-    await Comment.findByIdAndUpdate(id, {
-      like: updatedLike,
-    });
+//       updatedLike = [...comment.like, newLike];
+//     } else {
+//       updatedLike = post.like.filter((l) => l.userId != userId);
+//     }
+//     await Comment.findByIdAndUpdate(id, {
+//       like: updatedLike,
+//     });
 
-    if (isLike) {
-      // create notification
-      await Notification.create({
-        postId: id,
-        userId: post.userId.toString(),
-        profileImg,
-        username,
-        type: "like",
-      });
-    }
+//     if (isLike) {
+//       // create notification
+//       await Notification.create({
+//         postId: id,
+//         userId: post.userId.toString(),
+//         profileImg,
+//         username,
+//         type: "like",
+//       });
+//     }
 
-    res.success("like was updated successfully!", 200);
-  } catch (error) {
-    console.log("erorrr", error);
+//     res.success("like was updated successfully!", 200);
+//   } catch (error) {
+//     console.log("erorrr", error);
 
-    res.fail(error.message);
-  }
-}
+//     res.fail(error.message);
+//   }
+// }
 
-export async function likeOnReplyComment(req, res) {
-  // id is for comment modal
-  const id = req.params.id;
-  const { userId, username, profileImg, postId, notifiId } = req.body;
-  console.log("req", req.body);
+// export async function likeOnReplyComment(req, res) {
+//   // id is for comment modal
+//   const id = req.params.id;
+//   const { userId, username, profileImg, postId, notifiId } = req.body;
+//   console.log("req", req.body);
 
-  try {
-    const post = await Post.findById(postId);
-    const findFriend = await Friend.findOne({ userId: post.userId.toString() });
-    const isFriend = findFriend.listFriend.find(
-      (f) => f.id == userId && f.status == "accepted"
-    );
+//   try {
+//     const post = await Post.findById(postId);
+//     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+//     const isFriend = findFriend.listFriend.find(
+//       (f) => f.id == userId && f.status == "accepted"
+//     );
 
-    const isOwner = post.userId.toString() == userId ? true : false;
-    if (!isOwner) {
-      if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
-        res.fail("You are not authorized to like!");
-        return;
-      }
-    }
-    //first find comment
-    const comment = await Comment.findById(id);
-    console.log("comment", comment);
-    let updatedReply = [];
-    let updatedLike;
-    // second find reply
-    const findReply = comment.reply.find((r) => r.notifiId == notifiId);
-    //third find like
-    const findLike = findReply.like.find((r) => r.userId == req.userId);
+//     const isOwner = post.userId.toString() == userId ? true : false;
+//     if (!isOwner) {
+//       if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
+//         res.fail("You are not authorized to like!");
+//         return;
+//       }
+//     }
+//     //first find comment
+//     const comment = await Comment.findById(id);
+//     console.log("comment", comment);
+//     let updatedReply = [];
+//     let updatedLike;
+//     // second find reply
+//     const findReply = comment.reply.find((r) => r.notifiId == notifiId);
+//     //third find like
+//     const findLike = findReply.like.find((r) => r.userId == req.userId);
 
-    if (!findLike) {
-      const newLike = {
-        userId,
-        username,
-        profileImg,
-        postId,
-        // notifiId:create notifiid for shwing notification
-      };
+//     if (!findLike) {
+//       const newLike = {
+//         userId,
+//         username,
+//         profileImg,
+//         postId,
+//         // notifiId:create notifiid for shwing notification
+//       };
 
-      updatedReply = comment.reply.map((r) => {
-        if (r.notifiId == notifiId) {
-          const updatedLike = [...r.like, newLike];
-          return { ...r, like: updatedLike };
-        } else {
-          return r;
-        }
-      });
-    } else {
-      const updatedLike = findReply.like.filter((l) => l.userId != req.userId);
-      updatedReply = comment.reply.map((r) => {
-        if (r.notifiId == notifiId) {
-          return { ...r, like: updatedLike };
-        } else {
-          return r;
-        }
-      });
-    }
+//       updatedReply = comment.reply.map((r) => {
+//         if (r.notifiId == notifiId) {
+//           const updatedLike = [...r.like, newLike];
+//           return { ...r, like: updatedLike };
+//         } else {
+//           return r;
+//         }
+//       });
+//     } else {
+//       const updatedLike = findReply.like.filter((l) => l.userId != req.userId);
+//       updatedReply = comment.reply.map((r) => {
+//         if (r.notifiId == notifiId) {
+//           return { ...r, like: updatedLike };
+//         } else {
+//           return r;
+//         }
+//       });
+//     }
 
-    await Comment.findByIdAndUpdate(id, {
-      reply: updatedReply,
-    });
+//     await Comment.findByIdAndUpdate(id, {
+//       reply: updatedReply,
+//     });
 
-    if (!findLike) {
-      // create notification
-      await Notification.create({
-        postId: id,
-        userId: post.userId.toString(),
-        profileImg,
-        username,
-        type: "like",
-      });
-    }
+//     if (!findLike) {
+//       // create notification
+//       await Notification.create({
+//         postId: id,
+//         userId: post.userId.toString(),
+//         profileImg,
+//         username,
+//         type: "like",
+//       });
+//     }
 
-    res.success("like was updated successfully!", 200);
-  } catch (error) {
-    console.log("erorrr", error);
+//     res.success("like was updated successfully!", 200);
+//   } catch (error) {
+//     console.log("erorrr", error);
 
-    res.fail(error.message);
-  }
-}
-
+//     res.fail(error.message);
+//   }
+// }

@@ -3,14 +3,11 @@ import mongoose, { Schema } from "mongoose";
 const commentSchema = new mongoose.Schema(
   {
     postId: { type: String, require: true },
-    notifiId: { type: String, require: true },
-    userId: { type: String, require: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     text: { type: String, require: true },
-    username: { type: String, require: true },
-    profileImg: { type: String, require: true },
-    like: { type: Array, default: [] },
-    reply: { type: Array, default: [] },
-   
+    replyTo: { type: Schema.Types.ObjectId, ref: "Comment" },
+    likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    replies: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
   },
   { timestamps: true }
 );
