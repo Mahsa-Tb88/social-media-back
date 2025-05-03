@@ -5,13 +5,7 @@ import {
   editPostById,
   getPostsUserById,
   getPostById,
-  // commentOnPost,
-  // deleteComment,
-  // likeOnPost,
-  // updateIsSeenNotifi,
-  // getAllCommentsOfPost,
-  // likeOnComment,
-  // likeOnReplyComment,
+  likePost,
 } from "../controllers/postController.js";
 
 const router = express.Router();
@@ -24,7 +18,7 @@ router.delete("/:id", deletePost);
 router.put("/edit/:id", editPostById);
 
 // router.put("/comment/:id", commentOnPost);
-// router.put("/like/:id", likeOnPost);
+router.put("/like/:id", likePost);
 // router.put("/notification/:id", updateIsSeenNotifi);
 // router.put("/comment/delete/:id", deleteComment);
 // router.get("/comments/:id", getAllCommentsOfPost);
