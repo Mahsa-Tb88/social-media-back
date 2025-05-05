@@ -141,7 +141,7 @@ export async function likeComment(req, res) {
 
 export async function deleteComment(req, res) {
   const id = req.params.id;
-  const { postId, replyTo } = req.body;
+  const { postId, replyTo, userId } = req.body;
 
   try {
     const post = await Post.findById(postId);
@@ -161,11 +161,21 @@ export async function deleteComment(req, res) {
       }
     }
     //delete comment
-    await Comment.findByIdAndDelete(id);
     if (replyTo) {
+      // delete from database
+      await Comment.findByIdAndDelete(id);
+      // delete from replies in parent
       const comment = await Comment.findById(replyTo);
       const replies = comment.replies.filter((c) => c._id != id);
-      await Comment.findByIdAndUpdate(replyTo, replies);
+      await Comment.findByIdAndUpdate(replyTo, { replies });
+    } else {
+      //delete all replies of this parent
+      const comment = await Comment.findById(id);
+      if (comment.replies.length) {
+        await Comment.deleteMany({ replyTo: id });
+      }
+      // delete from database
+      await Comment.findByIdAndDelete(id);
     }
 
     res.success("likes was updated successfully!", 200);
