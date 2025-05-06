@@ -221,3 +221,21 @@ export async function deleteComment(req, res) {
     res.fail(error.message);
   }
 }
+
+export async function seenNotification(req, res) {
+  const id = req.params.id;
+  const { userId } = req.body;
+  console.log("..seennotifi", id);
+  try {
+    if (userId != req.userId) {
+      res.fail("You are not authorized!");
+      return;
+    }
+    await Notification.findByIdAndUpdate(id, { isSeen: true });
+
+    res.success("Unseen Notification was updated successfully!", 200);
+  } catch (error) {
+    console.log("erorrr", error);
+    res.fail(error.message);
+  }
+}
