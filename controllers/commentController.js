@@ -90,13 +90,28 @@ export async function leaveComment(req, res) {
 
       // notification
       const comment = await Comment.findById(replyTo);
-      await Notification.create({
-        text,
-        postId,
-        userId,
-        userGetComment: comment.userId,
-        type: "comment",
-      });
+
+      if (
+        comment.userId != post.userId.toString() &&
+        userId != comment.userId
+      ) {
+        await Notification.create({
+          text,
+          postId,
+          userId,
+          userGetComment: comment.userId,
+          type: "comment",
+        });
+      }
+      if (userId != post.userId.toString()) {
+        await Notification.create({
+          text,
+          postId,
+          userId,
+          userGetComment: post.userId.toString(),
+          type: "comment",
+        });
+      }
     } else {
       await Comment.create({
         postId,
@@ -105,7 +120,7 @@ export async function leaveComment(req, res) {
       });
 
       // notification
-      if (req.userId != post.userId.toString()) {
+      if (userId != post.userId.toString()) {
         await Notification.create({
           text,
           postId,
