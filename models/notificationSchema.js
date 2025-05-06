@@ -2,11 +2,10 @@ import mongoose, { Schema } from "mongoose";
 
 const notificationSchema = new mongoose.Schema(
   {
-    userId: { type: String, required: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User" },
     postId: { type: String, required: true },
-    username: { type: String, required: true },
-    profileImg: { type: String },
-    comment: { type: String, default: "" },
+    userGetComment: { type: Schema.Types.ObjectId, ref: "User" },
+    text: { type: String, default: "" },
     type: { type: String, default: "comment" },
     isSeen: { type: Boolean, default: false },
   },

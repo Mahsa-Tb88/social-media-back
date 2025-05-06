@@ -75,11 +75,11 @@ export async function loginUser(req, res) {
       return true;
     });
 
-    // find notification list 
+    // find notification list
 
     const findNotification = await Notification.find({
-      userId: user._id.toString(),
-    });
+      userGetComment: user._id.toString(),
+    }).populate({ path: "userGetComment", select: "username profileImg _id" });
     let notificationList = [];
     if (findNotification) {
       const unSeenNotifi = findNotification.filter((n) => n.isSeen == false);

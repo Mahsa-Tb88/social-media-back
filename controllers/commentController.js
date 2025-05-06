@@ -1,5 +1,6 @@
 import Comment from "../models/commentSchema.js";
 import Friend from "../models/friendSchema.js";
+import Notification from "../models/notificationSchema.js";
 import Post from "../models/postSchema.js";
 
 export async function getcommentsPost(req, res) {
@@ -86,12 +87,33 @@ export async function leaveComment(req, res) {
       await Comment.findByIdAndUpdate(replyTo, {
         $push: { replies: newComment._id },
       });
+
+      // notification
+      const comment = await Comment.findById(replyTo);
+      await Notification.create({
+        text,
+        postId,
+        userId,
+        userGetComment: comment.userId,
+        type: "comment",
+      });
     } else {
       await Comment.create({
         postId,
         userId,
         text,
       });
+
+      // notification
+      if (req.userId != post.userId.toString()) {
+        await Notification.create({
+          text,
+          postId,
+          userId,
+          userGetComment: post.userId.toString(),
+          type: "comment",
+        });
+      }
     }
 
     res.success("commnent was added successfully!", 200);
