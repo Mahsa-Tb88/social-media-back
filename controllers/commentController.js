@@ -166,6 +166,16 @@ export async function likeComment(req, res) {
       const likes = comment.likes.filter((user) => user._id != userId);
       await Comment.findByIdAndUpdate(commentId, { likes });
     } else {
+      if (req.userId !== comment.userId._id.toString()) {
+        await Notification.create({
+          postId: id,
+          userId,
+          userGetComment: comment.userId._id.toString(),
+          type: "like",
+          text: comment.text,
+        });
+      }
+
       await Comment.findByIdAndUpdate(commentId, { $push: { likes: userId } });
     }
 
@@ -225,7 +235,6 @@ export async function deleteComment(req, res) {
 export async function seenNotification(req, res) {
   const id = req.params.id;
   const { userId } = req.body;
-  console.log("..seennotifi", id);
   try {
     if (userId != req.userId) {
       res.fail("You are not authorized!");

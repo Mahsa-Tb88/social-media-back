@@ -95,7 +95,6 @@ export async function loginUser(req, res) {
         notificationList = findNotification;
       }
     }
-    console.log("notooo", notificationList);
     res.success("Login Successfully", {
       user,
       friends,
