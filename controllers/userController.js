@@ -21,7 +21,7 @@ export async function getAllUsers(req, res) {
 export async function getUserById(req, res) {
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {
-    res.fail("This User Id is not valid!");
+    res.fail("This user Id is not valid!");
     return;
   }
   console.log("get user");
@@ -34,18 +34,7 @@ export async function getUserById(req, res) {
     res.fail(error.message);
   }
 }
-export async function findUser(req, res) {
-  const username = req.query.user;
-  const query = {
-    $or: [{ username: RegExp(username, "i") }],
-  };
-  try {
-    const findUser = await User.find(query);
-    res.success("was found successfully!", findUser);
-  } catch (error) {
-    res.fail(error.message);
-  }
-}
+
 export async function findUserFriedns(req, res) {
   try {
     let friends;
@@ -121,7 +110,7 @@ export async function getUserIntro(req, res) {
 }
 
 export async function getSearchUser(req, res) {
-  const { search } = req.body;
+  const { search } = req.query;
   try {
     const users = await User.find({
       username: { $regex: search, $options: "i" }, // case-insensitive match
@@ -129,6 +118,18 @@ export async function getSearchUser(req, res) {
     const filterUsers = users.filter((user) => user._id != req.userId);
 
     res.success("get all users successfully", filterUsers);
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+export async function findUser(req, res) {
+  const username = req.query.search;
+  const query = {
+    $or: [{ username: RegExp(username, "i") }],
+  };
+  try {
+    const findUser = await User.find(query);
+    res.success("was found successfully!", findUser);
   } catch (error) {
     res.fail(error.message);
   }
