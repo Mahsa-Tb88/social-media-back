@@ -1,5 +1,5 @@
 import Friend from "../models/friendSchema.js";
-// import Notification from "../models/notificationSchema.js";
+import Notification from "../models/notificationSchema.js";
 import Post from "../models/postSchema.js";
 import mongoose from "mongoose";
 
@@ -49,7 +49,7 @@ export async function getPostById(req, res) {
     const post = await Post.findById(req.params.id)
       .populate("userId")
       .populate({ path: "likes", select: "username profileImg _id" });
-    console.log("post is", post);
+    // console.log("post is", post);
 
     const user = await Friend.findOne({ userId: post.userId._id });
 
@@ -168,6 +168,16 @@ export async function likePost(req, res) {
       likes = post.likes.filter((u) => u != userId);
     } else {
       likes = [...post.likes, userId];
+
+      if (req.userId !== post.userId.toString()) {
+        await Notification.create({
+          postId: id,
+          userId,
+          userGetComment: post.userId.toString(),
+          type: "like",
+          text: post.title,
+        });
+      }
     }
     await Post.findByIdAndUpdate(id, { likes });
 
