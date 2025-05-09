@@ -4,7 +4,8 @@ const notificationSchema = new mongoose.Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User" },
     postId: { type: String, required: true },
-    userGetComment: { type: Schema.Types.ObjectId, ref: "User" },
+    userGetReply: { type: Schema.Types.ObjectId, ref: "User" },
+    mentionUser: { type: Schema.Types.ObjectId, ref: "User" },
     text: { type: String, default: "" },
     type: { type: String, default: "comment" },
     isSeen: { type: Boolean, default: false },
