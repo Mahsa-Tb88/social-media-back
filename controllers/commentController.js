@@ -124,6 +124,7 @@ export async function leaveComment(req, res) {
         postId,
         userId,
         text,
+        mentionUser,
       });
 
       // notification
@@ -132,7 +133,7 @@ export async function leaveComment(req, res) {
           text,
           postId,
           userId,
-          userGetReply: post.userId.toString(),
+          userGetNotifi: post.userId.toString(),
           type: "comment",
         });
       }
@@ -141,7 +142,7 @@ export async function leaveComment(req, res) {
           text,
           postId,
           userId,
-          mentionUser,
+          userGetNotifi: mentionUser,
           type: "comment",
         });
       }

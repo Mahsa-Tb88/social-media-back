@@ -113,7 +113,7 @@ export async function getSearchUser(req, res) {
   const { search } = req.query;
   try {
     const users = await User.find({
-      username: { $regex: search, $options: "i" }, // case-insensitive match
+      username: { $regex: "^" + search, $options: "i" }, // case-insensitive match
     }).select("username profileImg _id");
     const filterUsers = users.filter((user) => user._id != req.userId);
 
