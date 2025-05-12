@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import User from "../models/userSchema.js";
 import Friend from "../models/friendSchema.js";
 import Overview from "../models/overviewSchema.js";
+import Post from "../models/postSchema.js";
 
 export async function getAllUsers(req, res) {
   try {
@@ -110,27 +111,50 @@ export async function getUserIntro(req, res) {
 }
 
 export async function getSearchUser(req, res) {
-  const { search } = req.query;
+  const { search, postId } = req.query;
+
   try {
     const users = await User.find({
       username: { $regex: "^" + search, $options: "i" }, // case-insensitive match
     }).select("username profileImg _id");
-    const filterUsers = users.filter((user) => user._id != req.userId);
+    //filter userLogin can not mention yourself
+    let filterUsers = users.filter((user) => user._id != req.userId);
+
+    //find userSearch that has a permisson to see the post and check if it is a friend to see the post if the post is for friends
+    const post = await Post.findById(postId);
+    const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+    function isFriend(userId) {
+      const findUser = findFriend.listFriend.find(
+        (f) => f.id == userId && f.status == "accepted"
+      );
+      if (findUser) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    if (post.viewer == "friends") {
+      filterUsers = filterUsers.filter((user) => isFriend(user._id));
+    }
+    if (post.viewer == "private") {
+      filterUsers = [];
+    }
 
     res.success("get all users successfully", filterUsers);
   } catch (error) {
     res.fail(error.message);
   }
 }
-export async function findUser(req, res) {
-  const username = req.query.search;
-  const query = {
-    $or: [{ username: RegExp(username, "i") }],
-  };
-  try {
-    const findUser = await User.find(query);
-    res.success("was found successfully!", findUser);
-  } catch (error) {
-    res.fail(error.message);
-  }
-}
+// export async function findUser(req, res) {
+//   const username = req.query.search;
+//   const query = {
+//     $or: [{ username: RegExp(username, "i") }],
+//   };
+//   try {
+//     const findUser = await User.find(query);
+//     res.success("was found successfully!", findUser);
+//   } catch (error) {
+//     res.fail(error.message);
+//   }
+// }

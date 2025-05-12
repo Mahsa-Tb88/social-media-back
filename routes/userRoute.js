@@ -1,7 +1,6 @@
 import express from "express";
 import {
   getUserById,
-  findUser,
   getAllUsers,
   findUserFriedns,
   getUserIntro,
