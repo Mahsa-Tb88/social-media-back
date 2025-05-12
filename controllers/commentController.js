@@ -58,6 +58,7 @@ export async function getcommentsPost(req, res) {
 export async function leaveComment(req, res) {
   const id = req.params.id;
   const { postId, userId, text, replyTo, mentionUser } = req.body;
+  console.log("re.body", req.body);
 
   try {
     const post = await Post.findById(id);
