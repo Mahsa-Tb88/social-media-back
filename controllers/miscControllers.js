@@ -59,10 +59,10 @@ export async function initialize(req, res) {
       // find Notofication
 
       const findNotification = await Notification.find({
-        userGetComment: user._id.toString(),
+        userGetNotifi: user._id.toString(),
       })
         .populate({
-          path: "userGetComment",
+          path: "userGetNotifi",
           select: "username profileImg _id",
         })
         .populate({ path: "userId", select: "username profileImg _id" });
@@ -79,6 +79,7 @@ export async function initialize(req, res) {
           notificationList = findNotification;
         }
       }
+      console.log("notifi", notificationList);
       res.success("Initialized successfully!", {
         categories,
         user,

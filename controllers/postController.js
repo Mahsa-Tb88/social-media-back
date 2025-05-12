@@ -173,9 +173,9 @@ export async function likePost(req, res) {
         await Notification.create({
           postId: id,
           userId,
-          userGetComment: post.userId.toString(),
-          type: "like",
-          text: post.title,
+          userGetNotifi: post.userId.toString(),
+          type: "post",
+          text: post.title ? post.title : post.desc,
         });
       }
     }

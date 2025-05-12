@@ -78,9 +78,9 @@ export async function loginUser(req, res) {
     // find notification list
 
     const findNotification = await Notification.find({
-      userGetComment: user._id.toString(),
+      userGetNotifi: user._id.toString(),
     })
-      .populate({ path: "userGetComment", select: "username profileImg _id" })
+      .populate({ path: "userGetNotifi", select: "username profileImg _id" })
       .populate({ path: "userId", select: "username profileImg _id" });
     let notificationList = [];
     if (findNotification) {

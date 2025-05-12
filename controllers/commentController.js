@@ -46,6 +46,10 @@ export async function getcommentsPost(req, res) {
             select: "username profileImg _id",
           },
         ],
+      })
+      .populate({
+        path: "mentionUser",
+        select: "username profileImg _id",
       });
 
     res.success("commnets was found successfully!", comments);
@@ -66,18 +70,16 @@ export async function leaveComment(req, res) {
     const isFriend = findFriend.listFriend.find(
       (f) => f.id == req.userId && f.status == "accepted"
     );
+
     const isFriendMentionUser = findFriend.listFriend.find(
       (f) => f.id == mentionUser && f.status == "accepted"
     );
     const isOwner = post.userId.toString() == req.userId ? true : false;
-    if (userId != req.userId) {
-      res.fail("You are not authorized to leave this comment!");
-      return;
-    }
+
     if (!isOwner) {
       if (
         (post.viewer == "friends" && !isFriend) ||
-        (post.viewer == "friends" && !isFriendMentionUser) ||
+        (post.viewer == "friends" && !isFriendMentionUser && !isFriend) ||
         post.viewer == "private"
       ) {
         res.fail("You are not authorized to leave this comment!");
@@ -252,7 +254,7 @@ export async function likeComment(req, res) {
         await Notification.create({
           postId: id,
           userId,
-          userGetReply: comment.userId._id.toString(),
+          userGetNotifi: comment.userId._id.toString(),
           type: "like",
           text: comment.text,
         });
