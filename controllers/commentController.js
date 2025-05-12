@@ -28,6 +28,10 @@ export async function getcommentsPost(req, res) {
             path: "userId",
             select: "username profileImg _id",
           },
+          {
+            path: "mentionUser",
+            select: "username profileImg _id",
+          },
         ],
       })
       .populate({
@@ -93,6 +97,7 @@ export async function leaveComment(req, res) {
         userId,
         text,
         replyTo,
+        mentionUser,
       });
       await Comment.findByIdAndUpdate(replyTo, {
         $push: { replies: newComment._id },
@@ -109,28 +114,10 @@ export async function leaveComment(req, res) {
           text,
           postId,
           userId,
-          userGetReply: comment.userId,
+          userGetNotifi: comment.userId,
           type: "comment",
         });
       }
-      if (userId != post.userId.toString()) {
-        await Notification.create({
-          text,
-          postId,
-          userId,
-          userGetReply: post.userId.toString(),
-          type: "comment",
-        });
-      }
-    } else {
-      await Comment.create({
-        postId,
-        userId,
-        text,
-        mentionUser,
-      });
-
-      // notification
       if (userId != post.userId.toString()) {
         await Notification.create({
           text,
@@ -140,7 +127,29 @@ export async function leaveComment(req, res) {
           type: "comment",
         });
       }
-      if (mentionUser && userId != mentionUser) {
+    }
+    if (mentionUser) {
+      if (!replyTo) {
+        await Comment.create({
+          postId,
+          userId,
+          text,
+          mentionUser,
+        });
+      }
+
+      // notification
+      if (userId != post.userId.toString() && !replyTo) {
+        await Notification.create({
+          text,
+          postId,
+          userId,
+          userGetNotifi: post.userId.toString(),
+          type: "comment",
+          replyTo,
+        });
+      }
+      if (userId != mentionUser && mentionUser != post.userId.toString()) {
         await Notification.create({
           text,
           postId,
