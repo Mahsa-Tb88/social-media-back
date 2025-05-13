@@ -56,6 +56,7 @@ export async function getcommentsPost(req, res) {
         select: "username profileImg _id",
       });
 
+    console.log("commentss", comments);
     res.success("commnets was found successfully!", comments);
   } catch (error) {
     console.log("erorrr", error);
@@ -66,7 +67,7 @@ export async function getcommentsPost(req, res) {
 export async function leaveComment(req, res) {
   const id = req.params.id;
   const { postId, userId, text, replyTo, mentionUser } = req.body;
-  console.log("re.body", req.body);
+  console.log("req.body comment", req.body);
 
   try {
     const post = await Post.findById(id);
@@ -90,22 +91,30 @@ export async function leaveComment(req, res) {
         return;
       }
     }
+    const newComment = await Comment.create({
+      postId,
+      userId,
+      text,
+      replyTo,
+      mentionUser,
+    });
 
-    if (replyTo) {
-      const newComment = await Comment.create({
+    if (userId != post.userId.toString()) {
+      await Notification.create({
+        text,
         postId,
         userId,
-        text,
-        replyTo,
-        mentionUser,
+        userGetNotifi: post.userId.toString(),
+        type: "comment",
       });
+    }
+
+    if (replyTo) {
       await Comment.findByIdAndUpdate(replyTo, {
         $push: { replies: newComment._id },
       });
-
       // notification
       const comment = await Comment.findById(replyTo);
-
       if (
         comment.userId != post.userId.toString() &&
         userId != comment.userId
@@ -118,37 +127,9 @@ export async function leaveComment(req, res) {
           type: "comment",
         });
       }
-      if (userId != post.userId.toString()) {
-        await Notification.create({
-          text,
-          postId,
-          userId,
-          userGetNotifi: post.userId.toString(),
-          type: "comment",
-        });
-      }
     }
     if (mentionUser) {
-      if (!replyTo) {
-        await Comment.create({
-          postId,
-          userId,
-          text,
-          mentionUser,
-        });
-      }
-
       // notification
-      if (userId != post.userId.toString() && !replyTo) {
-        await Notification.create({
-          text,
-          postId,
-          userId,
-          userGetNotifi: post.userId.toString(),
-          type: "comment",
-          replyTo,
-        });
-      }
       if (userId != mentionUser && mentionUser != post.userId.toString()) {
         await Notification.create({
           text,

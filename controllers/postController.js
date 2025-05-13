@@ -29,7 +29,6 @@ export async function getPostsUserById(req, res) {
         posts.push(p);
       }
     });
-
     if (isOwner) {
       posts = findPosts;
     }

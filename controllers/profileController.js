@@ -13,7 +13,8 @@ export async function updateBackground(req, res) {
     const user = await User.findByIdAndUpdate(id, { backgroundImg: image });
     res.success("updated Image Successfully!", 200);
   } catch (error) {
-    res.fail(error.message, 500);
+    console.log("error", error);
+    res.fail(error, 500);
   }
 }
 
@@ -39,8 +40,6 @@ export async function editUserById(req, res) {
     res.fail("This User Id is not valid!");
     return;
   }
-  console.log("lkkk", req.body);
-  console.log(id, req.userId);
   if (id != req.userId) {
     res.fail("You are not athorize to edit");
     return;
@@ -55,7 +54,6 @@ export async function editUserById(req, res) {
       viewerProfile: viewerProfile ? viewerProfile : user.viewerProfile,
       password: password ? hashPassword : user.password,
     });
-    console.log("userrr", userrr);
 
     res.success(
       "Updated successfully! You will be redirected to the login page in 5 seconds!"
