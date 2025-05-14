@@ -64,14 +64,38 @@ export async function loginUser(req, res) {
       };
       findAllMessages.push(myMsg);
     });
-    const seenUsernames = new Set();
-    const messages = findAllMessages.filter((user) => {
-      if (seenUsernames.has(user.username)) {
+    console.log("findAllMessages", findAllMessages);
+
+    let messages = [];
+
+    function isUserIn(username) {
+      const findUser = messages.find((u) => u.username == username);
+      if (findUser) {
+        return true;
+      } else {
         return false;
       }
-      seenUsernames.add(user.username);
-      return true;
+    }
+    findAllMessages.forEach((chat) => {
+      if (isUserIn(chat.username)) {
+        messages = messages.filter((u) => u.username != chat.username);
+        messages.push(chat);
+      } else {
+        messages.push(chat);
+      }
     });
+
+    // findAllMessages = findAllMessages.reverse();
+    // const seenUsernames = new Set();
+    // let messages = findAllMessages.filter((user) => {
+    //   // if (seenUsernames.has(user.username)) {
+    //   //   return false;
+    //   // }
+    //   // seenUsernames.add(user.username);
+    //   // return true;
+    // });
+
+    console.log("messages", messages);
 
     // find notification list
 
@@ -95,7 +119,6 @@ export async function loginUser(req, res) {
       }
     }
 
-
     res.success("Login Successfully", {
       user,
       friends,
@@ -103,6 +126,7 @@ export async function loginUser(req, res) {
       notificationList,
     });
   } catch (error) {
+    console.log("eroro", error);
     res.fail(error);
   }
 }
