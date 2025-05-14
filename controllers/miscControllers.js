@@ -29,9 +29,7 @@ export async function initialize(req, res) {
 
       //filter msg unread for user
       const filterMsgs = findMsgs.filter(
-        (msg) =>
-          msg.isRead == false &&
-          msg.userId._id.toString() != user._id.toString()
+        (msg) => msg.userId._id.toString() != user._id.toString()
       );
 
       let findAllMessages = [];
@@ -42,6 +40,7 @@ export async function initialize(req, res) {
           profileImg: msg.userId.profileImg,
           id: msg._id,
           msg: msg.msg,
+          isRead: msg.isRead,
         };
         findAllMessages.push(myMsg);
       });
@@ -79,7 +78,6 @@ export async function initialize(req, res) {
           notificationList = findNotification;
         }
       }
-      console.log("notifi", notificationList);
       res.success("Initialized successfully!", {
         categories,
         user,

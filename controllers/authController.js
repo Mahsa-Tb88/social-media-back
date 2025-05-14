@@ -7,6 +7,7 @@ import Notification from "../models/notificationSchema.js";
 
 export async function loginUser(req, res) {
   const { username, password, remember } = req.body;
+
   if (!username && !password) {
     return res.fail("Please enter username and password!", 400);
   }
@@ -27,7 +28,6 @@ export async function loginUser(req, res) {
         expiresIn: "7d",
       }
     );
-
     const settings = { httpOnly: true, secure: true, sameSite: "Lax" };
     if (remember) {
       settings.maxAge = 7 * 86400 * 1000;
@@ -44,15 +44,13 @@ export async function loginUser(req, res) {
       viewer: findFriends?.viewer,
       userId: findFriends?.userId,
     };
-
     //find unread msgs
     const findMsgs = await Chat.find({
       chatId: { $regex: user._id.toString() },
     }).populate("userId");
 
     const filterMsgs = findMsgs.filter(
-      (msg) =>
-        msg.isRead == false && msg.userId._id.toString() != user._id.toString()
+      (msg) => msg.userId._id.toString() != user._id.toString()
     );
     let findAllMessages = [];
     filterMsgs.forEach((msg) => {
@@ -62,10 +60,10 @@ export async function loginUser(req, res) {
         profileImg: msg.userId.profileImg,
         id: msg._id,
         msg: msg.msg,
+        isRead: msg.isRead,
       };
       findAllMessages.push(myMsg);
     });
-
     const seenUsernames = new Set();
     const messages = findAllMessages.filter((user) => {
       if (seenUsernames.has(user.username)) {
@@ -83,6 +81,7 @@ export async function loginUser(req, res) {
       .populate({ path: "userGetNotifi", select: "username profileImg _id" })
       .populate({ path: "userId", select: "username profileImg _id" });
     let notificationList = [];
+
     if (findNotification) {
       const unSeenNotifi = findNotification.filter((n) => n.isSeen == false);
       if (findNotification.length > 10) {
@@ -95,6 +94,8 @@ export async function loginUser(req, res) {
         notificationList = findNotification;
       }
     }
+
+
     res.success("Login Successfully", {
       user,
       friends,
