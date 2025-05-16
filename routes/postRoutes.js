@@ -6,6 +6,7 @@ import {
   getPostsUserById,
   getPostById,
   likePost,
+  publicPost,
 } from "../controllers/postController.js";
 
 const router = express.Router();
@@ -16,6 +17,6 @@ router.post("/new", createNewPost);
 router.delete("/:id", deletePost);
 router.put("/edit/:id", editPostById);
 router.put("/like/:id", likePost);
-
+router.get("/public", publicPost);
 
 export default router;

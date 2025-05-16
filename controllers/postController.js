@@ -186,3 +186,14 @@ export async function likePost(req, res) {
     res.fail(error.message);
   }
 }
+
+export async function publicPost(req, res) {
+  try {
+    const posts = await Post.find({ viewer: "public" });
+
+    res.success("Post was updated successfully!", posts);
+  } catch (error) {
+    console.log("erorrr", error);
+    res.fail(error.message);
+  }
+}
