@@ -189,9 +189,12 @@ export async function likePost(req, res) {
 
 export async function publicPost(req, res) {
   try {
-    const posts = await Post.find({ viewer: "public" });
-
-    res.success("Post was updated successfully!", posts);
+    console.log("publiccc");
+    const posts = await Post.find({ viewer: "public" }).populate({
+      path: "userId",
+      select: "username profileImg _id",
+    });
+    res.success("Posts has found successfully!", posts);
   } catch (error) {
     console.log("erorrr", error);
     res.fail(error.message);
