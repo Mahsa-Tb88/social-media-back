@@ -146,15 +146,17 @@ export async function getSearchUser(req, res) {
     res.fail(error.message);
   }
 }
-// export async function findUser(req, res) {
-//   const username = req.query.search;
-//   const query = {
-//     $or: [{ username: RegExp(username, "i") }],
-//   };
-//   try {
-//     const findUser = await User.find(query);
-//     res.success("was found successfully!", findUser);
-//   } catch (error) {
-//     res.fail(error.message);
-//   }
-// }
+
+export async function findUser(req, res) {
+  const username = req.query.q;
+  const query = {
+    $or: [{ username: RegExp(username, "i") }],
+  };
+  try {
+    const findUser = await User.find(query);
+    res.success("was found successfully!", findUser);
+  } catch (error) {
+    res.fail(error.message);
+  }
+}
+
