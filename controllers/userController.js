@@ -153,10 +153,10 @@ export async function findUser(req, res) {
     $or: [{ username: RegExp(username, "i") }],
   };
   try {
+    console.log("username is ", query);
     const findUser = await User.find(query);
     res.success("was found successfully!", findUser);
   } catch (error) {
     res.fail(error.message);
   }
 }
-

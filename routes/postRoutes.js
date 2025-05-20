@@ -6,12 +6,12 @@ import {
   getPostsUserById,
   getPostById,
   likePost,
-  publicPost,
+  homePosts,
 } from "../controllers/postController.js";
 
 const router = express.Router();
 
-router.get("/public", publicPost);
+router.get("/home", homePosts);
 router.get("/:id", getPostsUserById);
 router.get("/single/:id", getPostById);
 router.post("/new", createNewPost);

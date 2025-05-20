@@ -187,14 +187,29 @@ export async function likePost(req, res) {
   }
 }
 
-export async function publicPost(req, res) {
+export async function homePosts(req, res) {
+  const { userId } = req.query;
   try {
-    console.log("publiccc");
+    let postsList = [];
+    if (userId) {
+      let friends;
+      if (userId == req.userId) {
+        const userFrineds = await Friend.findOne({ userId });
+        friends = userFrineds.listFriend.filter((f) => f.status == "accepted");
+        const userIds = friends.map((f) => f.id);
+        const posts = await Post.find({ userId: { $in: userIds } }).populate({
+          path: "userId",
+          select: "username profileImg _id",
+        });
+        postsList = [...posts];
+      }
+    }
     const posts = await Post.find({ viewer: "public" }).populate({
       path: "userId",
       select: "username profileImg _id",
     });
-    res.success("Posts has found successfully!", posts);
+    postsList = [...postsList, ...posts];
+    res.success("Posts has found successfully!", postsList);
   } catch (error) {
     console.log("erorrr", error);
     res.fail(error.message);
