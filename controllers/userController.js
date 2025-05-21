@@ -25,7 +25,6 @@ export async function getUserById(req, res) {
     res.fail("This user Id is not valid!");
     return;
   }
-  console.log("get user");
   try {
     const user = await User.findById(req.params.id);
     user.password = undefined;
@@ -44,9 +43,9 @@ export async function findUserFriedns(req, res) {
       res.fail("This user Id is not valis!", 400);
       return;
     }
-
     // check is friend
     friends = await Friend.findOne({ userId: req.params.id });
+
     const findFriend = friends.listFriend.filter(
       (f) => f.id == req.userId && f.status == "accepted"
     );
@@ -150,10 +149,9 @@ export async function getSearchUser(req, res) {
 export async function findUser(req, res) {
   const username = req.query.q;
   const query = {
-    $or: [{ username: RegExp(username, "i") }],
+    $or: [{ username: RegExp("^" + username, "i") }],
   };
   try {
-    console.log("username is ", query);
     const findUser = await User.find(query);
     res.success("was found successfully!", findUser);
   } catch (error) {

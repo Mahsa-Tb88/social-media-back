@@ -197,10 +197,11 @@ export async function homePosts(req, res) {
         const userFrineds = await Friend.findOne({ userId });
         friends = userFrineds.listFriend.filter((f) => f.status == "accepted");
         const userIds = friends.map((f) => f.id);
-        const posts = await Post.find({ userId: { $in: userIds } }).populate({
+        let posts = await Post.find({ userId: { $in: userIds } }).populate({
           path: "userId",
           select: "username profileImg _id",
         });
+        posts = posts.filter((post) => post.viewer == "friends");
         postsList = [...posts];
       }
     }
@@ -208,6 +209,7 @@ export async function homePosts(req, res) {
       path: "userId",
       select: "username profileImg _id",
     });
+
     postsList = [...postsList, ...posts];
     res.success("Posts has found successfully!", postsList);
   } catch (error) {

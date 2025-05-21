@@ -35,6 +35,7 @@ export async function editUserById(req, res) {
   const { username, password, viewerProfile } = req.body;
   const id = req.params.id;
 
+
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {
     res.fail("This User Id is not valid!");
@@ -54,7 +55,12 @@ export async function editUserById(req, res) {
       viewerProfile: viewerProfile ? viewerProfile : user.viewerProfile,
       password: password ? hashPassword : user.password,
     });
-
+    await Friend.findOneAndUpdate(
+      { userId: id },
+      {
+        viewer: viewerProfile ? viewerProfile : user.viewerProfile,
+      }
+    );
     res.success(
       "Updated successfully! You will be redirected to the login page in 5 seconds!"
     );
