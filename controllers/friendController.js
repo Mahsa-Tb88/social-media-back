@@ -85,7 +85,6 @@ export async function confirmFriend(req, res) {
 
     //add the user who accept request to listFriend of user who sent request
     const findUser2 = await Friend.findOne({ userId: id });
-    console.log("findUser2--->", findUser2);
     const updatedListFriend = findUser2.listFriend.map((f) => {
       if (f.id == userId) {
         return { ...f, status: "accepted" };
@@ -113,7 +112,6 @@ export async function removeRequestFriend(req, res) {
     return;
   }
   const { id, userId } = req.body;
-  console.log("req.body", req.body);
   try {
     //delete request
     const findUserGotRequest = await Friend.findOne({ userId: id });

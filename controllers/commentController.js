@@ -56,7 +56,6 @@ export async function getcommentsPost(req, res) {
         select: "username profileImg _id",
       });
 
-    console.log("commentss", comments);
     res.success("commnets was found successfully!", comments);
   } catch (error) {
     console.log("erorrr", error);
@@ -67,7 +66,6 @@ export async function getcommentsPost(req, res) {
 export async function leaveComment(req, res) {
   const id = req.params.id;
   const { postId, userId, text, replyTo, mentionUser } = req.body;
-  console.log("req.body comment", req.body);
 
   try {
     const post = await Post.findById(id);

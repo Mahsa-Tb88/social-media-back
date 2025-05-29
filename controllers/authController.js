@@ -64,7 +64,6 @@ export async function loginUser(req, res) {
       };
       findAllMessages.push(myMsg);
     });
-    console.log("findAllMessages", findAllMessages);
 
     let messages = [];
 
@@ -95,7 +94,6 @@ export async function loginUser(req, res) {
     //   // return true;
     // });
 
-    console.log("messages", messages);
 
     // find notification list
 
