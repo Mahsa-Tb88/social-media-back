@@ -2,7 +2,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import multer from "multer";
 
-const allowedExtensions = ["png", "jpg", "webp", "jpeg", "svg"];
+const allowedExtensions = ["png", "jpg", "webp", "jpeg", "svg", "mov", "mp4"];
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const storage = multer.diskStorage({
@@ -12,17 +12,6 @@ const storage = multer.diskStorage({
       cb({ code: "INVALID_EXTENSION" });
     } else {
       cb(null, path.join(__dirname, "../", "uploads"));
-
-      //   if (file.originalname.toLowerCase().includes("blog")) {
-      //     req.folder = "blogs";
-      //     cb(null, path.join(__dirname, "../", "uploads/blogs"));
-      //   } else if (file.originalname.toLowerCase().includes("product")) {
-      //     req.folder = "products";
-      //     cb(null, path.join(__dirname, "../", "uploads/products"));
-      //   } else {
-      //     req.folder = "others";
-      //     cb(null, path.join(__dirname, "../", "uploads/others"));
-      //   }
     }
   },
   filename: function (req, file, cb) {
@@ -33,6 +22,6 @@ const storage = multer.diskStorage({
   },
 });
 
-const uploader = multer({ storage, limits: { fileSize: 1 * 1024 * 1204 } });
+const uploader = multer({ storage, limits: { fileSize: 700 * 1024 * 1024 } });
 
 export default uploader.single("file");
