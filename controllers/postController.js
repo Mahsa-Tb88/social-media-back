@@ -32,6 +32,7 @@ export async function getPostsUserById(req, res) {
     if (isOwner) {
       posts = findPosts;
     }
+
     res.success("found posts of user successfully!", posts);
   } catch (error) {
     res.fail(error.message, 500);
@@ -127,7 +128,7 @@ export async function editPostById(req, res) {
       title: title ? title : post.title,
       desc: desc ? desc : post.desc,
       image: image == "noImage" ? "" : image != "noImage" ? image : post.image,
-      video: video ? video : post.video,
+      video: video,
       feeling: feeling ? feeling : post.feeling,
       viewer: viewer ? viewer : post.viewer,
     });
