@@ -122,15 +122,14 @@ export async function editPostById(req, res) {
     res.fail("You are not authorized to edit this post");
   }
   try {
-    const post = await Post.findById(id);
 
     await Post.findByIdAndUpdate(id, {
-      title: title ? title : post.title,
-      desc: desc ? desc : post.desc,
-      image: image == "noImage" ? "" : image != "noImage" ? image : post.image,
-      video: video,
-      feeling: feeling ? feeling : post.feeling,
-      viewer: viewer ? viewer : post.viewer,
+      title,
+      desc,
+      image,
+      video,
+      feeling,
+      viewer,
     });
     res.success("Post was updated successfully!", 200);
   } catch (error) {
