@@ -13,9 +13,13 @@ export async function getPostsUserById(req, res) {
   try {
     const userFriends = await Friend.findOne({ userId: id });
 
-    const findFriend = userFriends.listFriend.find(
-      (f) => f.id == req.userId && f.status == "accepted"
-    );
+    let findFriend;
+    if (userFriends) {
+      findFriend = userFriends.listFriend.find(
+        (f) => f.id == req.userId && f.status == "accepted"
+      );
+    }
+
     const isFriend = findFriend ? true : false;
     const isOwner = req.userId == id ? true : false;
 

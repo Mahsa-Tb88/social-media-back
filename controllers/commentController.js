@@ -9,9 +9,13 @@ export async function getcommentsPost(req, res) {
   try {
     const post = await Post.findById(id);
     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
-    const isFriend = findFriend.listFriend.find(
-      (f) => f.id == req.userId && f.status == "accepted"
-    );
+    let isFriend;
+    if (findFriend) {
+      isFriend = findFriend.listFriend.find(
+        (f) => f.id == req.userId && f.status == "accepted"
+      );
+    }
+
     const isOwner = post.userId.toString() == req.userId ? true : false;
     if (!isOwner) {
       if ((post.viewer == "friends" && !isFriend) || post.viewer == "private") {
@@ -145,70 +149,6 @@ export async function leaveComment(req, res) {
     res.fail(error.message);
   }
 }
-
-// export async function leaveMentionComment(req, res) {
-//   const id = req.params.id;
-//   const { postId, userId, text, mentionUser } = req.body;
-
-//   try {
-//     const post = await Post.findById(id);
-//     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
-//     const isFriend = findFriend.listFriend.find(
-//       (f) => f.id == req.userId && f.status == "accepted"
-//     );
-//     const isFriendMentionUser = findFriend.listFriend.find(
-//       (f) => f.id == mentionUser && f.status == "accepted"
-//     );
-//     const isOwner = post.userId.toString() == req.userId ? true : false;
-//     if (userId != req.userId) {
-//       res.fail("You are not authorized to see comments!");
-//       return;
-//     }
-//     if (!isOwner) {
-//       if (
-//         (post.viewer == "friends" && !isFriend) ||
-//         (post.viewer == "friends" && !isFriendMentionUser) ||
-//         post.viewer == "private"
-//       ) {
-//         res.fail("You are not authorized to leave a comments!");
-//         return;
-//       }
-//     }
-
-//     await Comment.create({
-//       postId,
-//       userId,
-//       text,
-//       mentionUser,
-//     });
-
-//     // notification
-//     if (userId != post.userId.toString()) {
-//       await Notification.create({
-//         text,
-//         postId,
-//         userId,
-//         userGetComment: post.userId.toString(),
-//         type: "comment",
-//       });
-//     }
-
-//     if (userId != mentionUser) {
-//       await Notification.create({
-//         text,
-//         postId,
-//         userId,
-//         mentionUser,
-//         type: "comment",
-//       });
-//     }
-
-//     res.success("commnent was added successfully!", 200);
-//   } catch (error) {
-//     console.log("erorrr", error);
-//     res.fail(error.message);
-//   }
-// }
 
 export async function likeComment(req, res) {
   const id = req.params.id;
