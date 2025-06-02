@@ -88,12 +88,7 @@ export async function getAllMsgOfUser(req, res) {
 
 export async function sendChats(req, res) {
   const chatId = req.params.id;
-  //   const isValid = mongoose.isValidObjectId(chatId);
 
-  //   if (!isValid) {
-  //     res.fail("This Id is not valid!");
-  //     return;
-  //   }
   const isAuthorized = chatId.includes(req.userId);
   if (!isAuthorized) {
     res.fail("You are not authorized!");

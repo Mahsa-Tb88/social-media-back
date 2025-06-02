@@ -125,10 +125,14 @@ export async function getSearchUser(req, res) {
     //find userSearch that has a permisson to see the post and check if it is a friend to see the post if the post is for friends
     const post = await Post.findById(postId);
     const findFriend = await Friend.findOne({ userId: post.userId.toString() });
+
     function isFriend(userId) {
-      const findUser = findFriend.listFriend.find(
-        (f) => f.id == userId && f.status == "accepted"
-      );
+      let findUser;
+      if (findFriend) {
+        findUser = findFriend.listFriend.find(
+          (f) => f.id == userId && f.status == "accepted"
+        );
+      }
       if (findUser) {
         return true;
       } else {

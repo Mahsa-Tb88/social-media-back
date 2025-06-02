@@ -44,22 +44,24 @@ export async function loginUser(req, res) {
       viewer: findFriends?.viewer,
       userId: findFriends?.userId,
     };
-    //find unread msgs
+
+
+    //find all message with user
     const findMsgs = await Chat.find({
       chatId: { $regex: user._id.toString() },
     }).populate({ path: "userId", options: { strictPopulate: false } });
 
-    const filterMsgs = findMsgs.filter((msg) => {
-      if (msg?.userId) {
-        msg.userId._id.toString() != user._id.toString();
-      }
-    });
+    //filter msg unread for user
+    const filterMsgs = findMsgs.filter(
+      (msg) => msg.userId._id.toString() != user._id.toString()
+    );
+
     let findAllMessages = [];
     filterMsgs.forEach((msg) => {
       let myMsg = {
         chatId: msg.chatId,
-        username: msg.userId.username || "",
-        profileImg: msg.userId.profileImg || "",
+        username: msg.userId.username,
+        profileImg: msg.userId.profileImg,
         id: msg._id,
         msg: msg.msg,
         isRead: msg.isRead,

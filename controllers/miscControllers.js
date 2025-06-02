@@ -30,7 +30,6 @@ export async function initialize(req, res) {
       const filterMsgs = findMsgs.filter(
         (msg) => msg.userId._id.toString() != user._id.toString()
       );
-
       let findAllMessages = [];
       filterMsgs.forEach((msg) => {
         let myMsg = {
@@ -77,6 +76,7 @@ export async function initialize(req, res) {
           notificationList = findNotification;
         }
       }
+
       res.success("Initialized successfully!", {
         categories,
         user,
