@@ -32,9 +32,8 @@ export async function updateProfileImg(req, res) {
 }
 
 export async function editUserById(req, res) {
-  const { username, password, viewerProfile } = req.body;
+  const { username, password, viewerProfile, deleteAccount } = req.body;
   const id = req.params.id;
-
 
   const isValid = mongoose.isValidObjectId(req.params.id);
   if (!isValid) {
@@ -49,18 +48,23 @@ export async function editUserById(req, res) {
   const hashPassword = await bcrypt.hash(password, 10);
 
   try {
-    const user = await User.findById(id);
-    const userrr = await User.findByIdAndUpdate(id, {
-      username: username ? username.toLowerCase() : user.username,
-      viewerProfile: viewerProfile ? viewerProfile : user.viewerProfile,
-      password: password ? hashPassword : user.password,
-    });
-    await Friend.findOneAndUpdate(
-      { userId: id },
-      {
-        viewer: viewerProfile ? viewerProfile : user.viewerProfile,
-      }
-    );
+    if (deleteAccount) {
+      await User.findByIdAndDelete(id);
+      await Post.deleteMany({ userId: id });
+    } else {
+      const user = await User.findById(id);
+      await User.findByIdAndUpdate(id, {
+        username: username ? username.toLowerCase() : user.username,
+        viewerProfile: viewerProfile ? viewerProfile : user.viewerProfile,
+        password: password ? hashPassword : user.password,
+      });
+      await Friend.findOneAndUpdate(
+        { userId: id },
+        {
+          viewer: viewerProfile ? viewerProfile : user.viewerProfile,
+        }
+      );
+    }
     res.success(
       "Updated successfully! You will be redirected to the login page in 5 seconds!"
     );
