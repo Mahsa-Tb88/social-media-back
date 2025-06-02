@@ -5,6 +5,7 @@ import {
   editUserById,
   getGalleryByUserId,
 } from "../controllers/profileController.js";
+import { logoutUser } from "../controllers/authController.js";
 
 const router = express.Router();
 

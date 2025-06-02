@@ -3,6 +3,11 @@ import User from "../models/userSchema.js";
 import bcrypt from "bcrypt";
 import Post from "../models/postSchema.js";
 import Friend from "../models/friendSchema.js";
+import FamilyRel from "../models/familyRelationship.js";
+import Notification from "../models/notificationSchema.js";
+import Overview from "../models/overviewSchema.js";
+import PlaceLived from "../models/placeLived.js";
+import Work from "../models/workSchema.js";
 
 export async function updateBackground(req, res) {
   const { image, id } = req.body;
@@ -31,7 +36,7 @@ export async function updateProfileImg(req, res) {
   }
 }
 
-export async function editUserById(req, res) {
+export async function editUserById(req, res, next) {
   const { username, password, viewerProfile, deleteAccount } = req.body;
   const id = req.params.id;
 
@@ -49,8 +54,15 @@ export async function editUserById(req, res) {
 
   try {
     if (deleteAccount) {
-      await User.findByIdAndDelete(id);
+      await User.findByIdAndUpdate(id, { deleted: true });
       await Post.deleteMany({ userId: id });
+      await Education.deleteMany({ userId: id });
+      await FamilyRel.deleteMany({ userId: id });
+      await Friend.deleteMany({ userId: id });
+      await Notification.deleteMany({ userId: id });
+      await Overview.deleteMany({ userId: id });
+      await PlaceLived.deleteMany({ userId: id });
+      await Work.deleteMany({ userId: id });
     } else {
       const user = await User.findById(id);
       await User.findByIdAndUpdate(id, {

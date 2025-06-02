@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema(
   {
     isAdmin: { type: Boolean, default: false },
+    deleted: { type: Boolean, default: false },
     backgroundImg: { type: String, default: "" },
     profileImg: { type: String, default: "" },
     bio: { type: String, default: "", viewer: "private" },

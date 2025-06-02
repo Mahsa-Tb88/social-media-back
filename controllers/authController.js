@@ -47,17 +47,19 @@ export async function loginUser(req, res) {
     //find unread msgs
     const findMsgs = await Chat.find({
       chatId: { $regex: user._id.toString() },
-    }).populate("userId");
+    }).populate({ path: "userId", options: { strictPopulate: false } });
 
-    const filterMsgs = findMsgs.filter(
-      (msg) => msg.userId._id.toString() != user._id.toString()
-    );
+    const filterMsgs = findMsgs.filter((msg) => {
+      if (msg?.userId) {
+        msg.userId._id.toString() != user._id.toString();
+      }
+    });
     let findAllMessages = [];
     filterMsgs.forEach((msg) => {
       let myMsg = {
         chatId: msg.chatId,
-        username: msg.userId.username,
-        profileImg: msg.userId.profileImg,
+        username: msg.userId.username || "",
+        profileImg: msg.userId.profileImg || "",
         id: msg._id,
         msg: msg.msg,
         isRead: msg.isRead,
@@ -83,19 +85,6 @@ export async function loginUser(req, res) {
         messages.push(chat);
       }
     });
-
-    // findAllMessages = findAllMessages.reverse();
-    // const seenUsernames = new Set();
-    // let messages = findAllMessages.filter((user) => {
-    //   // if (seenUsernames.has(user.username)) {
-    //   //   return false;
-    //   // }
-    //   // seenUsernames.add(user.username);
-    //   // return true;
-    // });
-
-
-    // find notification list
 
     const findNotification = await Notification.find({
       userGetNotifi: user._id.toString(),
@@ -161,5 +150,8 @@ export async function registerUser(req, res) {
 
 export function logoutUser(req, res) {
   res.clearCookie("token");
+  req.username = "";
+  req.userId = "";
+  console.log("uuuu");
   res.success("logout was done Successully!");
 }

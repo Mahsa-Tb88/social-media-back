@@ -9,7 +9,6 @@ export async function initialize(req, res) {
 
   try {
     categories = await Category.find();
-
     if (req.username) {
       user = await User.findOne({ username: req.username });
       user.password = undefined;
@@ -25,7 +24,7 @@ export async function initialize(req, res) {
       //find all message with user
       const findMsgs = await Chat.find({
         chatId: { $regex: user._id.toString() },
-      }).populate("userId");
+      }).populate({ path: "userId", options: { strictPopulate: false } });
 
       //filter msg unread for user
       const filterMsgs = findMsgs.filter(
