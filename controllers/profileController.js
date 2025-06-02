@@ -8,6 +8,7 @@ import Notification from "../models/notificationSchema.js";
 import Overview from "../models/overviewSchema.js";
 import PlaceLived from "../models/placeLived.js";
 import Work from "../models/workSchema.js";
+import { findUser } from "./userController.js";
 
 export async function updateBackground(req, res) {
   const { image, id } = req.body;
@@ -94,9 +95,13 @@ export async function getGalleryByUserId(req, res) {
       return;
     }
     const friendsUser = await Friend.findOne({ userId: id });
-    const findFriend = friendsUser.listFriend.filter(
-      (f) => f.id == req.userId && f.status == "accepted"
-    );
+    let findFriend;
+    if (friendsUser) {
+      findFriend = friendsUser.listFriend.filter(
+        (f) => f.id == req.userId && f.status == "accepted"
+      );
+    }
+
     const posts = await Post.find({ userId: id });
     if (!posts) {
       res.success("No photos or videos yet!", { photos: [], videos: [] });
@@ -129,9 +134,9 @@ export async function getGalleryByUserId(req, res) {
         }
       }
     });
-
     res.success("gallery was found successfully!", { photos, videos });
   } catch (error) {
+    console.log("error is", error);
     res.fail(error.message);
   }
 }

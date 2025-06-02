@@ -11,10 +11,13 @@ export async function getOverview(req, res) {
       return;
     }
     const userFriend = await Friend.findOne({ userId: req.params.id });
-    console.log("userFriend", userFriend);
-    let isFriend = userFriend.listFriend.find(
-      (friend) => friend.id == req.userId && friend.status == "accepted"
-    );
+    let isFriend;
+    if (userFriend) {
+      isFriend = userFriend.listFriend.find(
+        (friend) => friend.id == req.userId && friend.status == "accepted"
+      );
+    }
+
     isFriend = isFriend ? true : false;
     const isOwner = req.userId == req.params.id ? true : false;
 
