@@ -80,9 +80,13 @@ export async function getUserIntro(req, res) {
       return;
     }
     const userFriend = await Friend.findOne({ userId: req.params.id });
-    let isFriend = userFriend.listFriend.find(
-      (friend) => friend.id == req.userId && friend.status == "accepted"
-    );
+    let isFriend;
+    if (userFriend) {
+      isFriend = userFriend.listFriend.find(
+        (friend) => friend.id == req.userId && friend.status == "accepted"
+      );
+    }
+
     isFriend = isFriend ? true : false;
     const isOwner = req.userId == req.params.id ? true : false;
 
@@ -98,7 +102,6 @@ export async function getUserIntro(req, res) {
         overview = findOverview;
       }
     }
-
     res.success("UserInfo was found successfully", {
       overview,
       isFriend,

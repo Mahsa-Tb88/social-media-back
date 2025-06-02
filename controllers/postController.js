@@ -122,7 +122,6 @@ export async function editPostById(req, res) {
     res.fail("You are not authorized to edit this post");
   }
   try {
-
     await Post.findByIdAndUpdate(id, {
       title,
       desc,
@@ -194,16 +193,21 @@ export async function homePosts(req, res) {
       let friends;
       if (userId == req.userId) {
         const userFrineds = await Friend.findOne({ userId });
-        friends = userFrineds.listFriend.filter((f) => f.status == "accepted");
-        const userIds = friends.map((f) => f.id);
-        let posts = await Post.find({ userId: { $in: userIds } })
-          .populate({
-            path: "userId",
-            select: "username profileImg _id",
-          })
-          .populate({ path: "likes", select: "username profileImg _id" });
-        posts = posts.filter((post) => post.viewer == "friends");
-        postsList = [...posts];
+        if (userFrineds) {
+          friends = userFrineds.listFriend.filter(
+            (f) => f.status == "accepted"
+          );
+
+          const userIds = friends.map((f) => f.id);
+          let posts = await Post.find({ userId: { $in: userIds } })
+            .populate({
+              path: "userId",
+              select: "username profileImg _id",
+            })
+            .populate({ path: "likes", select: "username profileImg _id" });
+          posts = posts.filter((post) => post.viewer == "friends");
+          postsList = [...posts];
+        }
       }
     }
     const posts = await Post.find({ viewer: "public" })
