@@ -13,9 +13,13 @@ export async function getEducation(req, res) {
     }
 
     const findUserFriend = await Friend.findOne({ userId: id });
-    const friend = findUserFriend.listFriend.find(
-      (f) => f.id == req.userId && f.status == "accepted"
-    );
+    let friend;
+    if (findUserFriend) {
+      friend = findUserFriend.listFriend.find(
+        (f) => f.id == req.userId && f.status == "accepted"
+      );
+    }
+
     const isFriend = friend ? true : false;
     const isOwner = req.userId == id ? true : false;
 

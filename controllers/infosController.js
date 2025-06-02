@@ -14,9 +14,12 @@ export async function getContacUserInfo(req, res) {
     }
 
     let fidnFriend = await Friend.findOne({ userId: id });
-    fidnFriend = fidnFriend.listFriend.find(
-      (f) => f.id == req.userId && f.status == "accepted"
-    );
+    if (fidnFriend) {
+      fidnFriend = fidnFriend.listFriend.find(
+        (f) => f.id == req.userId && f.status == "accepted"
+      );
+    }
+
     const isFriend = fidnFriend ? true : false;
     const isOwner = req.userId == id ? true : false;
 

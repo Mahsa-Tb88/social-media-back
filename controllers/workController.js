@@ -13,10 +13,13 @@ export async function getWork(req, res) {
     }
 
     const findUserFriend = await Friend.findOne({ userId: id });
-    
-    const friend = findUserFriend.listFriend.find(
-      (f) => f.id == req.userId && f.status == "accepted"
-    );
+    let friend;
+    if (findUserFriend) {
+      friend = findUserFriend.listFriend.find(
+        (f) => f.id == req.userId && f.status == "accepted"
+      );
+    }
+
     const isFriend = friend ? true : false;
     const isOwner = req.userId == id ? true : false;
 
@@ -30,7 +33,6 @@ export async function getWork(req, res) {
     if (isOwner) {
       work = findWork;
     }
-
 
     res.success("workEducation was found successfully!", [
       work,
