@@ -7,7 +7,10 @@ import Post from "../models/postSchema.js";
 export async function getAllUsers(req, res) {
   try {
     const users = await User.find();
-    let selectedUsers = users.filter((user) => user._id != req.userId);
+    let selectedUsers = users.filter(
+      (user) => user._id != req.userId && !user.deleted
+    );
+
     selectedUsers = selectedUsers.map((user) => {
       user.password = undefined;
       user.emailRegister = undefined;
