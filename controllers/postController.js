@@ -25,7 +25,7 @@ export async function getPostsUserById(req, res) {
 
     const findPosts = await Post.find({ userId: req.params.id }).populate({
       path: "likes",
-      select: "username profileImg _id",
+      select: "username profileImg _id deleted",
     });
     let posts = [];
     findPosts.forEach((p) => {
@@ -52,7 +52,7 @@ export async function getPostById(req, res) {
   try {
     const post = await Post.findById(req.params.id)
       .populate("userId")
-      .populate({ path: "likes", select: "username profileImg _id" });
+      .populate({ path: "likes", select: "username profileImg _id deleted" });
 
     const user = await Friend.findOne({ userId: post.userId._id });
 
@@ -206,9 +206,12 @@ export async function homePosts(req, res) {
           let posts = await Post.find({ userId: { $in: userIds } })
             .populate({
               path: "userId",
-              select: "username profileImg _id",
+              select: "username profileImg _id deleted",
             })
-            .populate({ path: "likes", select: "username profileImg _id" });
+            .populate({
+              path: "likes",
+              select: "username profileImg _id deleted",
+            });
           posts = posts.filter((post) => post.viewer == "friends");
           postsList = [...posts];
         }
@@ -219,7 +222,7 @@ export async function homePosts(req, res) {
         path: "userId",
         select: "username profileImg _id",
       })
-      .populate({ path: "likes", select: "username profileImg _id" });
+      .populate({ path: "likes", select: "username profileImg _id deleted" });
 
     postsList = [...postsList, ...posts];
     res.success("Posts has found successfully!", postsList);

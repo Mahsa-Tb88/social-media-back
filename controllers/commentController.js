@@ -30,34 +30,34 @@ export async function getcommentsPost(req, res) {
         populate: [
           {
             path: "userId",
-            select: "username profileImg _id",
+            select: "username profileImg _id deleted",
           },
           {
             path: "mentionUser",
-            select: "username profileImg _id",
+            select: "username profileImg _id deleted",
           },
         ],
       })
       .populate({
         path: "userId",
-        select: "username profileImg _id", // only include these fields
+        select: "username profileImg _id deleted", // only include these fields
       })
       .populate({
         path: "likes",
-        select: "username profileImg _id",
+        select: "username profileImg _id deleted",
       })
       .populate({
         path: "replies",
         populate: [
           {
             path: "likes",
-            select: "username profileImg _id",
+            select: "username profileImg _id deleted",
           },
         ],
       })
       .populate({
         path: "mentionUser",
-        select: "username profileImg _id",
+        select: "username profileImg _id deleted",
       });
 
     res.success("commnets was found successfully!", comments);
