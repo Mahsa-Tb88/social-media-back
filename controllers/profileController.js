@@ -8,7 +8,7 @@ import Notification from "../models/notificationSchema.js";
 import Overview from "../models/overviewSchema.js";
 import PlaceLived from "../models/placeLived.js";
 import Work from "../models/workSchema.js";
-import { findUser } from "./userController.js";
+import Education from "../models/educationSchema.js";
 
 export async function updateBackground(req, res) {
   const { image, id } = req.body;
@@ -52,7 +52,6 @@ export async function editUserById(req, res, next) {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
-
   try {
     if (deleteAccount) {
       await User.findByIdAndUpdate(id, { deleted: true });
@@ -64,6 +63,7 @@ export async function editUserById(req, res, next) {
       await Overview.deleteMany({ userId: id });
       await PlaceLived.deleteMany({ userId: id });
       await Work.deleteMany({ userId: id });
+      await Friend.updateMany({}, { $pull: { friendRequestList: { id } } });
     } else {
       const user = await User.findById(id);
       await User.findByIdAndUpdate(id, {
@@ -82,6 +82,7 @@ export async function editUserById(req, res, next) {
       "Updated successfully! You will be redirected to the login page in 5 seconds!"
     );
   } catch (error) {
+    console.log("error is ", error);
     res.fail(error.message);
   }
 }

@@ -13,10 +13,11 @@ export async function loginUser(req, res) {
   }
   try {
     const user = await User.findOne({ username: username.toLowerCase() });
-    if (!user) {
+    if (!user || user.deleted) {
       res.fail("This username is not registerd!", 402);
       return;
     }
+
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res.fail("This Password is not valid!", 402);
@@ -44,7 +45,6 @@ export async function loginUser(req, res) {
       viewer: findFriends?.viewer,
       userId: findFriends?.userId,
     };
-
 
     //find all message with user
     const findMsgs = await Chat.find({
@@ -94,7 +94,6 @@ export async function loginUser(req, res) {
       .populate({ path: "userGetNotifi", select: "username profileImg _id" })
       .populate({ path: "userId", select: "username profileImg _id" });
     let notificationList = [];
-
     if (findNotification) {
       const unSeenNotifi = findNotification.filter((n) => n.isSeen == false);
       if (findNotification.length > 10) {
