@@ -6,6 +6,7 @@ import {
   getUserIntro,
   getSearchUser,
   findUser,
+  findMutualUserFriedns
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.get("/:id", getUserById);
 router.get("/username/search/", getSearchUser);
 router.get("/search/findUser", findUser);
 router.get("/friends/:id", findUserFriedns);
+router.get("/mutual/friend/:id", findMutualUserFriedns);
 
 export default router;

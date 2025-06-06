@@ -74,6 +74,44 @@ export async function findUserFriedns(req, res) {
     res.fail(error.message);
   }
 }
+export async function findMutualUserFriedns(req, res) {
+  console.log("uuuu");
+  try {
+    // id is userId not userLoginId
+    const id = req.params.id;
+    console.log("iddd", id);
+    const findUser = await User.findById(id);
+    if (!findUser) {
+      res.fail("This user Id is not valis!", 400);
+      return;
+    }
+    let findUserFriend = await Friend.findOne({ userId: id });
+    findUserFriend = findUserFriend.listFriend.filter(
+      (f) => f.status == "accepted"
+    );
+
+    let findUserLoginFriend = await Friend.findOne({ userId: req.userId });
+    findUserLoginFriend = findUserLoginFriend.listFriend.filter(
+      (f) => f.status == "accepted"
+    );
+   
+    //find mutual friend:
+    const mutualFriends = findUserFriend.filter((item1) =>
+      findUserLoginFriend.some((item2) => item1.id === item2.id)
+    );
+
+    res.success(
+      "Mutual friends and number of friends were found successfully!",
+      {
+        mutualFriends,
+        numOfFriends: findUserFriend,
+      }
+    );
+  } catch (error) {
+    console.log("error is ", error);
+    res.fail(error.message);
+  }
+}
 
 export async function getUserIntro(req, res) {
   try {

@@ -54,7 +54,12 @@ export async function editUserById(req, res, next) {
   const hashPassword = await bcrypt.hash(password, 10);
   try {
     if (deleteAccount) {
-      await User.findByIdAndUpdate(id, { deleted: true });
+      const user = await User.findById(id);
+      await User.findByIdAndUpdate(id, {
+        deleted: true,
+        username: "***" + user.username,
+        email: "***" + user.email,
+      });
       await Post.deleteMany({ userId: id });
       await Education.deleteMany({ userId: id });
       await FamilyRel.deleteMany({ userId: id });
