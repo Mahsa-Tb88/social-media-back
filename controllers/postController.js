@@ -51,7 +51,7 @@ export async function getPostById(req, res) {
   }
   try {
     const post = await Post.findById(req.params.id)
-      .populate("userId")
+      .populate({ path: "userId", select: "username profileImg _id deleted" })
       .populate({ path: "likes", select: "username profileImg _id deleted" });
 
     const user = await Friend.findOne({ userId: post.userId._id });
@@ -59,12 +59,17 @@ export async function getPostById(req, res) {
     const isFriend = user.listFriend.find(
       (f) => f.id == req.userId && f.status == "accepted"
     );
+    console.log("isFrined", isFriend);
 
     if (
       req.userId != post.userId._id &&
       !isFriend &&
-      post.viewer == "private"
+      post.viewer == "friends"
     ) {
+      res.fail("Access denied: Not a friend", 400);
+      return;
+    }
+    if (req.userId != post.userId._id && post.viewer == "private") {
       res.fail("Access denied: Not a friend", 400);
       return;
     }

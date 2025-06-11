@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema(
     username: { type: String, required: true, unique: true },
     emailRegister: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    viewerProfile: { type: String, default: "private" },
+    viewerProfile: { type: String, default: "friends" },
   },
   { timestamps: true }
 );

@@ -75,11 +75,9 @@ export async function findUserFriedns(req, res) {
   }
 }
 export async function findMutualUserFriedns(req, res) {
-  console.log("uuuu");
   try {
     // id is userId not userLoginId
     const id = req.params.id;
-    console.log("iddd", id);
     const findUser = await User.findById(id);
     if (!findUser) {
       res.fail("This user Id is not valis!", 400);

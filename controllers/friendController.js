@@ -7,8 +7,14 @@ export async function makeFriend(req, res) {
     res.fail("This User Id is not valid!");
     return;
   }
-  const { userId, userProfileImg, userUsername, id, username, profileImg } =
-    req.body;
+  const {
+    userId,
+    userProfileImg,
+    userUsername,
+    id: id1,
+    username,
+    profileImg,
+  } = req.body;
 
   try {
     // add user who sent request to FriendRequestList of user got request

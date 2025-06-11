@@ -143,7 +143,7 @@ export async function registerUser(req, res) {
     });
 
     newUser.password = undefined;
-    res.success("New User created successfully!", newUser);
+    res.success(" Registration successful. Welcome aboard!", newUser);
   } catch (error) {
     res.fail(error.message, 500);
   }
@@ -153,6 +153,5 @@ export function logoutUser(req, res) {
   res.clearCookie("token");
   req.username = "";
   req.userId = "";
-  console.log("uuuu");
   res.success("logout was done Successully!");
 }
