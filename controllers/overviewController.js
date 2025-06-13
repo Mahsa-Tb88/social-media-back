@@ -77,9 +77,9 @@ export async function updateOverview(req, res) {
       });
     }
 
-    res.success(" was updated successfully");
+    res.success(subject + " updated successfully!");
   } catch (error) {
-    console.log(error.message);
+    res.fail(error.message);
   }
 }
 

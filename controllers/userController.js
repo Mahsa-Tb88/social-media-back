@@ -74,35 +74,47 @@ export async function findUserFriedns(req, res) {
     res.fail(error.message);
   }
 }
+
 export async function findMutualUserFriedns(req, res) {
   try {
     // id is userId not userLoginId
     const id = req.params.id;
+    console.log("id is", id);
+
     const findUser = await User.findById(id);
     if (!findUser) {
       res.fail("This user Id is not valis!", 400);
       return;
     }
+
     let findUserFriend = await Friend.findOne({ userId: id });
-    findUserFriend = findUserFriend.listFriend.filter(
-      (f) => f.status == "accepted"
-    );
+    if (findUserFriend) {
+      findUserFriend = findUserFriend.listFriend.filter(
+        (f) => f.status == "accepted"
+      );
+    }
 
     let findUserLoginFriend = await Friend.findOne({ userId: req.userId });
-    findUserLoginFriend = findUserLoginFriend.listFriend.filter(
-      (f) => f.status == "accepted"
-    );
-   
+    if (findUserLoginFriend) {
+      findUserLoginFriend = findUserLoginFriend.listFriend.filter(
+        (f) => f.status == "accepted"
+      );
+    }
+
     //find mutual friend:
-    const mutualFriends = findUserFriend.filter((item1) =>
-      findUserLoginFriend.some((item2) => item1.id === item2.id)
-    );
+    let mutualFriends = [];
+
+    if (findUserFriend && findUserLoginFriend) {
+      mutualFriends = findUserFriend.filter((item1) =>
+        findUserLoginFriend.some((item2) => item1.id === item2.id)
+      );
+    }
 
     res.success(
       "Mutual friends and number of friends were found successfully!",
       {
         mutualFriends,
-        numOfFriends: findUserFriend,
+        numOfFriends: findUserFriend || [],
       }
     );
   } catch (error) {

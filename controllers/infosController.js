@@ -5,7 +5,6 @@ import Friend from "../models/friendSchema.js";
 
 export async function getContacUserInfo(req, res) {
   const id = req.params.id;
-
   try {
     const user = await User.findById(id);
     if (!user) {
@@ -62,12 +61,12 @@ export async function updateConatctUserInfo(req, res) {
   try {
     const findItem = await ContactBasicInfo.findOne({ userId: req.params.id });
     if (findItem) {
-      const updatee = await ContactBasicInfo.findOneAndUpdate(
+      await ContactBasicInfo.findOneAndUpdate(
         { userId: req.params.id },
         { [subject]: { value, viewer } }
       );
     } else {
-      const newi = await ContactBasicInfo.create({
+      await ContactBasicInfo.create({
         userId: req.params.id,
         [subject]: { value, viewer },
       });
