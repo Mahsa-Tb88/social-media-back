@@ -39,6 +39,7 @@ export async function loginUser(req, res) {
     //find user's friends
     let friends;
     const findFriends = await Friend.findOne({ userId: user._id.toString() });
+    console.log("findFrineds", findFriends);
     friends = {
       listFriend: findFriends?.listFriend || [],
       friendRequestList: findFriends?.friendRequestList || [],
@@ -150,8 +151,12 @@ export async function registerUser(req, res) {
 }
 
 export function logoutUser(req, res) {
-  res.clearCookie("token");
-  req.username = "";
-  req.userId = "";
-  res.success("logout was done Successully!");
+  try {
+    res.clearCookie("token");
+    req.username = "";
+    req.userId = "";
+    res.success("logout was done Successully!");
+  } catch (error) {
+    res.fail(error.message, 500);
+  }
 }

@@ -39,6 +39,7 @@ export async function getUserById(req, res) {
 }
 
 export async function findUserFriedns(req, res) {
+  console.log("yeees");
   try {
     let friends;
     const findUser = await User.findById(req.params.id);
@@ -69,6 +70,17 @@ export async function findUserFriedns(req, res) {
       };
     }
 
+    let ids = [];
+    friends.listFriend = friends.listFriend.filter(
+      (f) => f.status == "accepted"
+    );
+    friends.listFriend.forEach((element) => {
+      ids.push(element.id);
+    });
+    friends.listFriend = await User.find(
+      { _id: { $in: ids } },
+      "_id profileImg username"
+    );
     res.success("Friends were found successfully!", friends);
   } catch (error) {
     res.fail(error.message);
@@ -109,6 +121,17 @@ export async function findMutualUserFriedns(req, res) {
         findUserLoginFriend.some((item2) => item1.id === item2.id)
       );
     }
+
+    //update profileImg
+    let ids = [];
+    mutualFriends = mutualFriends.filter((f) => f.status == "accepted");
+    mutualFriends.slice(0, 3).forEach((element) => {
+      ids.push(element.id);
+    });
+    mutualFriends = await User.find(
+      { _id: { $in: ids } },
+      "_id profileImg username"
+    );
 
     res.success(
       "Mutual friends and number of friends were found successfully!",
@@ -211,8 +234,29 @@ export async function findUser(req, res) {
   };
   try {
     const findUser = await User.find(query);
-    res.success("was found successfully!", findUser);
+    const findFriend = await Friend.findOne({ userId: req.userId });
+    let userList = [];
+    if (findFriend && findUser) {
+      findFriend.listFriend.forEach((u) => {
+        //check listFriend
+        const user1 = findUser.find((f) => f._id.toString() == u.id);
+        if (user1) {
+          userList.push(user1);
+        }
+      });
+
+      findFriend.friendRequestList.forEach((u) => {
+        //check friendRequestList
+        const user2 = findUser.find((f) => f._id.toString() == u.id);
+        if (user2) {
+          userList.push(user2);
+        }
+      });
+    }
+
+    res.success("was found successfully!", userList);
   } catch (error) {
+    console.log("eror", error);
     res.fail(error.message);
   }
 }
