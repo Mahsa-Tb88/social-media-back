@@ -16,7 +16,7 @@ export async function updateBackground(req, res) {
     res.fail("You are not authorized to change picture", 400);
   }
   try {
- await User.findByIdAndUpdate(id, { backgroundImg: image });
+    await User.findByIdAndUpdate(id, { backgroundImg: image });
     res.success("updated Image Successfully!", 200);
   } catch (error) {
     console.log("error", error);
@@ -68,7 +68,10 @@ export async function editUserById(req, res, next) {
       await Overview.deleteMany({ userId: id });
       await PlaceLived.deleteMany({ userId: id });
       await Work.deleteMany({ userId: id });
-      await Friend.updateMany({}, { $pull: { friendRequestList: { id } } });
+      await Friend.updateMany(
+        {},
+        { $pull: { friendRequestList: { id }, listFriend: { id } } }
+      );
     } else {
       const user = await User.findById(id);
       await User.findByIdAndUpdate(id, {
