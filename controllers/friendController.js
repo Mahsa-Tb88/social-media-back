@@ -103,7 +103,6 @@ export async function confirmFriend(req, res) {
     res.fail(error.message);
   }
 }
-
 export async function removeRequestFriend(req, res) {
   //cancel request or delete request friend
   const isValid = mongoose.isValidObjectId(req.params.userId);
