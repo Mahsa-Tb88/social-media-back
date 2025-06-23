@@ -47,40 +47,56 @@ export async function findUserFriedns(req, res) {
       res.fail("This user Id is not valis!", 400);
       return;
     }
-    // check is friend
+
     friends = await Friend.findOne({ userId: req.params.id });
+    if (friends) {
+      if (req.params.id == req.userId) {
+        friends = {
+          message: "list friends",
+          listFriend: friends.listFriend,
+        };
+      } else {
+        // check is friend
+        const findFriend = friends.listFriend.filter(
+          (f) => f.id == req.userId && f.status == "accepted"
+        );
 
-    const findFriend = friends.listFriend.filter(
-      (f) => f.id == req.userId && f.status == "accepted"
-    );
+        if (friends.viewer == "private") {
+          friends = { message: "This Section is private", listFriend: [] };
+        } else if (friends.viewer == "friends" && !findFriend.length) {
+          friends = {
+            message: "You don’t have permission to view this section!",
+            listFriend: [],
+          };
+        } else if (!friends) {
+          friends = { message: "There is no friend yet!", listFriend: [] };
+        } else {
+          friends = {
+            message: "list friends",
+            listFriend: friends.listFriend,
+          };
+        }
+      }
 
-    if (friends.viewer == "private") {
-      friends = { message: "This Section is private", listFriend: [] };
-    } else if (friends.viewer == "friends" && !findFriend.length) {
-      friends = {
-        message: "You don’t have permission to view this section!",
-        listFriend: [],
-      };
-    } else if (!friends) {
-      friends = { message: "There is no friend yet!", listFriend: [] };
+      //to get updated profileimg of users
+      let ids = [];
+      friends.listFriend = friends.listFriend.filter(
+        (f) => f.status == "accepted"
+      );
+      friends.listFriend.forEach((element) => {
+        ids.push(element.id);
+      });
+      friends.listFriend = await User.find(
+        { _id: { $in: ids } },
+        "_id profileImg username"
+      );
     } else {
-      friends = {
-        message: "list friends",
-        listFriend: friends.listFriend,
-      };
+      friends = { listFriend: [], message: "There is no friends yet!" };
     }
-
-    let ids = [];
     friends.listFriend = friends.listFriend.filter(
-      (f) => f.status == "accepted"
+      (f) => !f.username.includes("*")
     );
-    friends.listFriend.forEach((element) => {
-      ids.push(element.id);
-    });
-    friends.listFriend = await User.find(
-      { _id: { $in: ids } },
-      "_id profileImg username"
-    );
+
     res.success("Friends were found successfully!", friends);
   } catch (error) {
     res.fail(error.message);
@@ -234,6 +250,7 @@ export async function findUser(req, res) {
   };
   try {
     const findUser = await User.find(query);
+    console.log("finduser", findUser);
     const findFriend = await Friend.findOne({ userId: req.userId });
     let userList = [];
     if (findFriend && findUser) {
@@ -241,7 +258,12 @@ export async function findUser(req, res) {
         //check listFriend
         const user1 = findUser.find((f) => f._id.toString() == u.id);
         if (user1) {
-          userList.push(user1);
+          userList.push({
+            profileImg: user1.profileImg,
+            id: user1._id.toString(),
+            username: user1.username,
+            status: u.status,
+          });
         }
       });
 
@@ -249,11 +271,30 @@ export async function findUser(req, res) {
         //check friendRequestList
         const user2 = findUser.find((f) => f._id.toString() == u.id);
         if (user2) {
-          userList.push(user2);
+          userList.push({
+            profileImg: user2.profileImg,
+            id: user2._id.toString(),
+            username: user2.username,
+            status: "requested",
+          });
         }
       });
     }
 
+    if (userList.length != findUser.length) {
+      // check an elememt of array A is in array B
+      findUser.forEach((f) => {
+        const user = userList.find((u) => u.id == f._id.toString());
+        if (!user) {
+          userList.push({
+            profileImg: f.profileImg,
+            id: f._id.toString(),
+            username: f.username,
+            status: "",
+          });
+        }
+      });
+    }
     res.success("was found successfully!", userList);
   } catch (error) {
     console.log("eror", error);

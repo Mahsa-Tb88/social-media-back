@@ -83,7 +83,7 @@ export async function confirmFriend(req, res) {
       }
     );
 
-    //add the user who accept request to listFriend of user who sent request
+    //add the user to who accept request to listFriend of user who sent request
     const findUser2 = await Friend.findOne({ userId: id });
     const updatedListFriend = findUser2.listFriend.map((f) => {
       if (f.id == userId) {
