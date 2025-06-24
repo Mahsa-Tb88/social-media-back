@@ -237,7 +237,7 @@ export async function deleteComment(req, res) {
       await Comment.findByIdAndDelete(id);
     }
 
-    res.success("likes was updated successfully!", 200);
+    res.success("Comment was deleted successfully!", 200);
   } catch (error) {
     console.log("erorrr", error);
     res.fail(error.message);

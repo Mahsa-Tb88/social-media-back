@@ -39,7 +39,7 @@ export async function getUserById(req, res) {
 }
 
 export async function findUserFriedns(req, res) {
-  console.log("yeees");
+  console.log("id", req.params.id);
   try {
     let friends;
     const findUser = await User.findById(req.params.id);
@@ -52,7 +52,7 @@ export async function findUserFriedns(req, res) {
     if (friends) {
       if (req.params.id == req.userId) {
         friends = {
-          message: "list friends",
+          message: "Friends",
           listFriend: friends.listFriend,
         };
       } else {
