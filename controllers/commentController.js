@@ -239,7 +239,7 @@ export async function deleteComment(req, res) {
 
     res.success("Comment was deleted successfully!", 200);
   } catch (error) {
-    console.log("erorrr", error);
+    
     res.fail(error.message);
   }
 }
