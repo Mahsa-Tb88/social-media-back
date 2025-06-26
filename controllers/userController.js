@@ -39,7 +39,6 @@ export async function getUserById(req, res) {
 }
 
 export async function findUserFriedns(req, res) {
-  console.log("id", req.params.id);
   try {
     let friends;
     const findUser = await User.findById(req.params.id);
