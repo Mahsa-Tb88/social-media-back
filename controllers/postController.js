@@ -126,8 +126,7 @@ export async function deletePost(req, res) {
 
 export async function editPostById(req, res) {
   const { title, desc, image, video, feeling, viewer, userId, id } = req.body;
-
-  if (req.userId !== userId) {
+  if (req.userId !== userId._id) {
     res.fail("You are not authorized to edit this post");
   }
   try {

@@ -118,7 +118,7 @@ export async function getGalleryByUserId(req, res) {
 
     let photos = [];
     let videos = [];
-    
+
     posts.forEach((post) => {
       if (post.viewer == "public" || req.userId === post.userId.toString()) {
         if (post.image) {
