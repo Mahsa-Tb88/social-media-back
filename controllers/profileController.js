@@ -31,7 +31,7 @@ export async function updateProfileImg(req, res) {
   }
   try {
     const user = await User.findByIdAndUpdate(id, { profileImg: image });
-    res.success("updated Image Successfully!", 200);
+    res.success("Image was updated  Successfully!", 200);
   } catch (error) {
     res.fail(error.message, 500);
   }

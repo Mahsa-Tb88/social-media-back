@@ -46,7 +46,7 @@ export async function getFamilyRel(req, res) {
       }
     }
 
-    res.success("workEducation was found successfully!", [
+    res.success("Data was found successfully!", [
       { relationship, family },
       isFriend,
       isOwner,
@@ -101,7 +101,7 @@ export async function deleteRelationship(req, res) {
   }
   try {
     await FamilyRel.findOneAndUpdate({ userId }, { relationship: {} });
-    res.success("Relationship was deleted successfully!");
+    res.success("Item was deleted successfully!");
   } catch (error) {
     res.fail(error.message);
   }
@@ -125,7 +125,7 @@ export async function filterViewer(req, res) {
       { userId: id },
       { relationship: { ...user.relationship, viewer } }
     );
-    res.success("Filter viewer is applied successfully!");
+    res.success("Filter viewer was applied successfully!");
   } catch (error) {
     res.fail(error.message);
   }

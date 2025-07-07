@@ -294,7 +294,7 @@ export async function findUser(req, res) {
         }
       });
     }
-    res.success("was found successfully!", userList);
+    res.success("User list was found successfully!", userList);
   } catch (error) {
     console.log("eror", error);
     res.fail(error.message);
