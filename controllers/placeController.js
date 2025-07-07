@@ -98,7 +98,7 @@ export async function addPlace(req, res) {
       });
     }
 
-    res.success("Place was found successfully!", places);
+    res.success("Place was added successfully!", places);
   } catch (error) {
     res.fail(error.message);
   }
@@ -142,7 +142,7 @@ export async function editPlace(req, res) {
         { usedToLiveCity: updatedUsedToLiveCity }
       );
     }
-    res.success("Place was found successfully!");
+    res.success("Place was updated successfully!");
   } catch (error) {
     res.fail(error.message);
   }
@@ -172,7 +172,7 @@ export async function deletePlace(req, res) {
         { usedToLiveCity: updatedPlace }
       );
     }
-    res.success("Place was found successfully!", places);
+    res.success("Place was deleted successfully!", places);
   } catch (error) {
     res.fail(error.message);
   }

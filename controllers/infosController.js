@@ -78,6 +78,7 @@ export async function updateConatctUserInfo(req, res) {
   }
 }
 export async function deleteConatctUserInfo(req, res) {
+  console.log("............");
   if (req.params.id != req.userId) {
     res.fail("You are not authorized");
     return;
