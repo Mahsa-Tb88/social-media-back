@@ -1,3 +1,4 @@
+import Comment from "../models/commentSchema.js";
 import Friend from "../models/friendSchema.js";
 import Notification from "../models/notificationSchema.js";
 import Post from "../models/postSchema.js";
@@ -44,15 +45,19 @@ export async function getPostsUserById(req, res) {
 }
 
 export async function getPostById(req, res) {
+  console.log("id post", req.params.id);
   const isValid = mongoose.isValidObjectId(req.params.id);
+
   if (!isValid) {
-    res.fail("This Id is not valid!");
-    return;
+    return res.fail("Sorry! This post does not exist!");
   }
   try {
     const post = await Post.findById(req.params.id)
       .populate({ path: "userId", select: "username profileImg _id deleted" })
       .populate({ path: "likes", select: "username profileImg _id deleted" });
+    if (!post) {
+      return res.fail("Sorry! This post does not exist!");
+    }
 
     const user = await Friend.findOne({ userId: post.userId._id });
 
@@ -76,6 +81,7 @@ export async function getPostById(req, res) {
 
     res.success("found posts of user successfully!", post);
   } catch (error) {
+    c;
     res.fail(error.message, 500);
   }
 }
@@ -111,6 +117,8 @@ export async function deletePost(req, res) {
         res.fail("You are not authorized to delete this post");
         return;
       } else {
+
+        await Comment.deleteMany({ postId: req.params.id });
         await Post.findByIdAndDelete(req.params.id);
         res.success("Post was deleted successfully!", 200);
         return;
@@ -120,6 +128,7 @@ export async function deletePost(req, res) {
       return;
     }
   } catch (error) {
+    console.log("errorrrrrrrrrr", error);
     res.fail(error.message);
   }
 }

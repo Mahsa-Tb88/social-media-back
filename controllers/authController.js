@@ -40,12 +40,16 @@ export async function loginUser(req, res) {
     let friends;
     let findFriends = await Friend.findOne({ userId: user._id.toString() });
     console.log("findFrineds", findFriends);
-    findFriends = findFriends?.listFriend.filter(
+    let listFriend = findFriends?.listFriend.filter(
       (f) => !f.username.includes("*")
     );
+    let friendRequestList = findFriends?.friendRequestList.filter(
+      (f) => !f.username.includes("*")
+    );
+    console.log("findFriends.... auth ", findFriends);
     friends = {
-      listFriend: findFriends || [],
-      friendRequestList: findFriends?.friendRequestList || [],
+      listFriend: listFriend || [],
+      friendRequestList: friendRequestList || [],
       viewer: findFriends?.viewer,
       userId: findFriends?.userId,
     };
