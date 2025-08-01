@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import responseMiddleware from "./middlewares/responseMiddleWare.js";
+import corsMiddleware from "./middlewares/corsMiddleWare.js";
 import { checkToken } from "./middlewares/authMiddleWare.js";
 
 import miscRoutes from "./routes/miscRoutes.js";
@@ -34,7 +35,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 app.use(express.json());
-app.use(cookieParser());
 app.use(
   cors({
     origin: true,
@@ -42,8 +42,12 @@ app.use(
   })
 );
 app.use(responseMiddleware);
+app.use(corsMiddleware);
+app.use(cookieParser());
 app.use(checkToken);
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/", express.static(path.join(__dirname, "dist")));
 
 app.use("/misc", miscRoutes);
 app.use("/auth", authRoutes);
@@ -61,11 +65,16 @@ app.use("/posts", postRoutes);
 app.use("/chats", chatRoutes);
 app.use("/comments", commentRoutes);
 
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
+
+const Port = process.env.PORT || 3000;
 try {
   await mongoose.connect(process.env.MONGO_URL);
   console.log("connected to database");
-  app.listen(3000, () => {
-    console.log("Server is running on http://localhost:3000");
+  app.listen(Port, () => {
+    console.log("Server is running on http://localhost:" + Port);
   });
 } catch (error) {
   console.log(error.message);
